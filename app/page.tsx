@@ -1,101 +1,179 @@
-import Image from "next/image";
+import Link from "next/link"
+import { ArrowRight, CheckCircle, Handshake, LineChart, ShieldCheck } from "lucide-react"
+
+import { Button } from "@/components/ui/button"
 
 export default function Home() {
   return (
-    <div className="grid grid-rows-[20px_1fr_20px] items-center justify-items-center min-h-screen p-8 pb-20 gap-16 sm:p-20 font-[family-name:var(--font-geist-sans)]">
-      <main className="flex flex-col gap-8 row-start-2 items-center sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
-          priority
-        />
-        <ol className="list-inside list-decimal text-sm text-center sm:text-left font-[family-name:var(--font-geist-mono)]">
-          <li className="mb-2">
-            Get started by editing{" "}
-            <code className="bg-black/[.05] dark:bg-white/[.06] px-1 py-0.5 rounded font-semibold">
-              app/page.tsx
-            </code>
-            .
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
-
-        <div className="flex gap-4 items-center flex-col sm:flex-row">
-          <a
-            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
+    <div className="flex flex-col min-h-screen">
+      {/* Hero Section */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-gradient-to-b from-green-50 to-white dark:from-green-950 dark:to-background">
+        <div className="container px-4 md:px-6">
+          <div className="grid gap-6 lg:grid-cols-2 lg:gap-12 items-center">
+            <div className="flex flex-col justify-center space-y-4">
+              <div className="space-y-2">
+                <h1 className="text-3xl font-bold tracking-tighter sm:text-5xl xl:text-6xl/none">
+                  Connecting Farmers & Buyers Through Assured Contracts
+                </h1>
+                <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                  Secure, transparent, and reliable contract farming platform that benefits both farmers and buyers.
+                </p>
+              </div>
+              <div className="flex flex-col gap-2 min-[400px]:flex-row">
+                <Link href="/signup">
+                  <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                    Get Started
+                    <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </Link>
+                <Link href="/about">
+                  <Button size="lg" variant="outline">
+                    Learn More
+                  </Button>
+                </Link>
+              </div>
+            </div>
+            <img
+              src="/contract.jpg"
+              width={550}
+              height={550}
+              alt="Farm Contract"
+              className="mx-auto aspect-video overflow-hidden rounded-xl object-cover sm:w-full lg:order-last"
             />
-            Deploy now
-          </a>
-          <a
-            className="rounded-full border border-solid border-black/[.08] dark:border-white/[.145] transition-colors flex items-center justify-center hover:bg-[#f2f2f2] dark:hover:bg-[#1a1a1a] hover:border-transparent text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:min-w-44"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Read our docs
-          </a>
+          </div>
         </div>
-      </main>
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
+      </section>
+
+      {/* Features Section */}
+      <section className="w-full py-12 md:py-24 lg:py-32">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <div className="inline-block rounded-lg bg-green-100 px-3 py-1 text-sm dark:bg-green-800">
+                Key Features
+              </div>
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-5xl">Why Choose Our Platform?</h2>
+              <p className="max-w-[900px] text-muted-foreground md:text-xl/relaxed lg:text-base/relaxed xl:text-xl/relaxed">
+                Our platform provides everything needed for successful contract farming relationships.
+              </p>
+            </div>
+          </div>
+          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-6 py-12 md:grid-cols-2 lg:grid-cols-3">
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-800">
+                <Handshake className="h-6 w-6 text-green-600 dark:text-green-200" />
+              </div>
+              <h3 className="text-xl font-bold">Secure Contracts</h3>
+              <p className="text-center text-muted-foreground">
+                Legally binding digital contracts with clear terms and conditions.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-800">
+                <ShieldCheck className="h-6 w-6 text-green-600 dark:text-green-200" />
+              </div>
+              <h3 className="text-xl font-bold">Verified Partners</h3>
+              <p className="text-center text-muted-foreground">
+                All buyers and farmers are verified to ensure trust and reliability.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-800">
+                <LineChart className="h-6 w-6 text-green-600 dark:text-green-200" />
+              </div>
+              <h3 className="text-xl font-bold">Price Predictions</h3>
+              <p className="text-center text-muted-foreground">
+                Data-driven price forecasts to help make informed decisions.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-800">
+                <CheckCircle className="h-6 w-6 text-green-600 dark:text-green-200" />
+              </div>
+              <h3 className="text-xl font-bold">Quality Assurance</h3>
+              <p className="text-center text-muted-foreground">
+                Standardized quality parameters and inspection processes.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-800">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6 text-green-600 dark:text-green-200"
+                >
+                  <circle cx="8" cy="21" r="1" />
+                  <circle cx="19" cy="21" r="1" />
+                  <path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold">Marketplace</h3>
+              <p className="text-center text-muted-foreground">
+                Connect with potential partners and explore new opportunities.
+              </p>
+            </div>
+            <div className="flex flex-col items-center space-y-2 rounded-lg border p-6 shadow-sm">
+              <div className="rounded-full bg-green-100 p-3 dark:bg-green-800">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="h-6 w-6 text-green-600 dark:text-green-200"
+                >
+                  <path d="m12 14 4-4" />
+                  <path d="M3.34 19a10 10 0 1 1 17.32 0" />
+                </svg>
+              </div>
+              <h3 className="text-xl font-bold">Transparent Payments</h3>
+              <p className="text-center text-muted-foreground">
+                Secure payment system with complete transaction history.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50 dark:bg-green-950">
+        <div className="container px-4 md:px-6">
+          <div className="flex flex-col items-center justify-center space-y-4 text-center">
+            <div className="space-y-2">
+              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
+                Ready to Transform Your Farming Business?
+              </h2>
+              <p className="max-w-[600px] text-muted-foreground md:text-xl">
+                Join thousands of farmers and buyers already benefiting from our platform.
+              </p>
+            </div>
+            <div className="flex flex-col gap-2 min-[400px]:flex-row">
+              <Link href="/signup">
+                <Button size="lg" className="bg-green-600 hover:bg-green-700">
+                  Sign Up Now
+                </Button>
+              </Link>
+              <Link href="/contact-us">
+                <Button size="lg" variant="outline">
+                  Contact Us
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
     </div>
-  );
+  )
 }
+
