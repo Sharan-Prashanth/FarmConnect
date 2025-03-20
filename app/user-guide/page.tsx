@@ -1,10 +1,9 @@
 "use client"
 
-import { Button } from "@/components/ui/button"
-
 import { useState } from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Button } from "@/components/ui/button"
 import {
   UserPlus,
   LogIn,
@@ -16,51 +15,55 @@ import {
   ArrowRight,
   CheckCircle,
 } from "lucide-react"
+import { useLanguage } from "@/context/language-context"
+import { LanguageSelector } from "@/components/language-selector"
 
-export default function UserGuide() {
+export default function Page() {
+  const { t } = useLanguage()
   const [activeTab, setActiveTab] = useState("signup")
 
   return (
     <div className="container mx-auto py-10 px-4">
-      <h1 className="text-3xl font-bold mb-6 text-center">AgriContract Platform User Guide</h1>
-      <p className="text-muted-foreground text-center mb-10 max-w-3xl mx-auto">
-        Welcome to AgriContract! This guide will help you navigate through our platform and make the most of our
-        features.
-      </p>
+      <div className="flex justify-end mb-4">
+        <LanguageSelector />
+      </div>
+
+      <h1 className="text-3xl font-bold mb-6 text-center">{t("guide.title")}</h1>
+      <p className="text-muted-foreground text-center mb-10 max-w-3xl mx-auto">{t("guide.welcome")}</p>
 
       <Tabs defaultValue={activeTab} onValueChange={setActiveTab} className="w-full max-w-4xl mx-auto">
         <TabsList className="grid grid-cols-4 md:grid-cols-8 mb-8">
           <TabsTrigger value="signup" className="flex flex-col items-center gap-1 py-2 h-auto">
             <UserPlus className="h-4 w-4" />
-            <span className="text-xs">Sign Up</span>
+            <span className="text-xs">{t("tab.signup")}</span>
           </TabsTrigger>
           <TabsTrigger value="login" className="flex flex-col items-center gap-1 py-2 h-auto">
             <LogIn className="h-4 w-4" />
-            <span className="text-xs">Login</span>
+            <span className="text-xs">{t("tab.login")}</span>
           </TabsTrigger>
           <TabsTrigger value="contracts" className="flex flex-col items-center gap-1 py-2 h-auto">
             <FileText className="h-4 w-4" />
-            <span className="text-xs">Contracts</span>
+            <span className="text-xs">{t("tab.contracts")}</span>
           </TabsTrigger>
           <TabsTrigger value="marketplace" className="flex flex-col items-center gap-1 py-2 h-auto">
             <ShoppingBag className="h-4 w-4" />
-            <span className="text-xs">Marketplace</span>
+            <span className="text-xs">{t("tab.marketplace")}</span>
           </TabsTrigger>
           <TabsTrigger value="negotiation" className="flex flex-col items-center gap-1 py-2 h-auto">
             <MessageSquare className="h-4 w-4" />
-            <span className="text-xs">Negotiation</span>
+            <span className="text-xs">{t("tab.negotiation")}</span>
           </TabsTrigger>
           <TabsTrigger value="transactions" className="flex flex-col items-center gap-1 py-2 h-auto">
             <BarChart3 className="h-4 w-4" />
-            <span className="text-xs">Transactions</span>
+            <span className="text-xs">{t("tab.transactions")}</span>
           </TabsTrigger>
           <TabsTrigger value="profile" className="flex flex-col items-center gap-1 py-2 h-auto">
             <UserCircle className="h-4 w-4" />
-            <span className="text-xs">Profile</span>
+            <span className="text-xs">{t("tab.profile")}</span>
           </TabsTrigger>
           <TabsTrigger value="verification" className="flex flex-col items-center gap-1 py-2 h-auto">
             <CheckCircle className="h-4 w-4" />
-            <span className="text-xs">Verification</span>
+            <span className="text-xs">{t("tab.verification")}</span>
           </TabsTrigger>
         </TabsList>
 
@@ -69,58 +72,53 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserPlus className="h-5 w-5 text-green-600" />
-                Creating an Account
+                {t("signup.title")}
               </CardTitle>
-              <CardDescription>Follow these steps to create your AgriContract account</CardDescription>
+              <CardDescription>{t("signup.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Step 1: Navigate to the Sign Up page</h3>
-                <p className="text-muted-foreground">
-                  Click on the "Sign Up" button in the top navigation bar of the website.
-                </p>
+                <h3 className="font-medium">{t("signup.step1.title")}</h3>
+                <p className="text-muted-foreground">{t("signup.step1.description")}</p>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Tip:</strong> You can also access the sign-up page directly at{" "}
+                    <strong>Tip:</strong> {t("signup.step1.tip")}{" "}
                     <span className="font-mono text-xs bg-muted p-1 rounded">https://agricontract.com/signup</span>
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Step 2: Fill in your personal information</h3>
-                <p className="text-muted-foreground">Complete all required fields in the sign-up form:</p>
+                <h3 className="font-medium">{t("signup.step2.title")}</h3>
+                <p className="text-muted-foreground">{t("signup.step2.description")}</p>
                 <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                  <li>Full Name (as it appears on your official documents)</li>
-                  <li>Email Address (you'll need to verify this later)</li>
-                  <li>Phone Number (with country code)</li>
-                  <li>Password (must be at least 8 characters with a mix of letters, numbers, and symbols)</li>
-                  <li>Address (your primary business or residence address)</li>
+                  <li>{t("signup.step2.field1")}</li>
+                  <li>{t("signup.step2.field2")}</li>
+                  <li>{t("signup.step2.field3")}</li>
+                  <li>{t("signup.step2.field4")}</li>
+                  <li>{t("signup.step2.field5")}</li>
                 </ul>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Step 3: Select your user role</h3>
-                <p className="text-muted-foreground">Choose the appropriate role that best describes you:</p>
+                <h3 className="font-medium">{t("signup.step3.title")}</h3>
+                <p className="text-muted-foreground">{t("signup.step3.description")}</p>
                 <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
                   <li>
-                    <strong>Farmer:</strong> If you grow crops and want to sell them or enter into farming contracts
+                    <strong>{t("signup.step3.role1.title")}</strong> {t("signup.step3.role1.description")}
                   </li>
                   <li>
-                    <strong>Buyer:</strong> If you purchase agricultural products from farmers
+                    <strong>{t("signup.step3.role2.title")}</strong> {t("signup.step3.role2.description")}
                   </li>
                   <li>
-                    <strong>Agent:</strong> If you facilitate transactions between farmers and buyers
+                    <strong>{t("signup.step3.role3.title")}</strong> {t("signup.step3.role3.description")}
                   </li>
                 </ul>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Step 4: Create your account</h3>
-                <p className="text-muted-foreground">
-                  Click the "Create Account" button to submit your information. You'll be redirected to the verification
-                  page.
-                </p>
+                <h3 className="font-medium">{t("signup.step4.title")}</h3>
+                <p className="text-muted-foreground">{t("signup.step4.description")}</p>
               </div>
             </CardContent>
           </Card>
@@ -131,36 +129,29 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <LogIn className="h-5 w-5 text-green-600" />
-                Logging Into Your Account
+                {t("login.title")}
               </CardTitle>
-              <CardDescription>Access your AgriContract dashboard by logging in</CardDescription>
+              <CardDescription>{t("login.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Step 1: Navigate to the Login page</h3>
-                <p className="text-muted-foreground">
-                  Click on the "Login" button in the top navigation bar of the website.
-                </p>
+                <h3 className="font-medium">{t("login.step1.title")}</h3>
+                <p className="text-muted-foreground">{t("login.step1.description")}</p>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Step 2: Enter your credentials</h3>
-                <p className="text-muted-foreground">
-                  Enter your registered email address and password in the respective fields.
-                </p>
+                <h3 className="font-medium">{t("login.step2.title")}</h3>
+                <p className="text-muted-foreground">{t("login.step2.description")}</p>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Tip:</strong> If you've forgotten your password, click on the "Forgot password?" link to
-                    reset it.
+                    <strong>Tip:</strong> {t("login.step2.tip")}
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Step 3: Access your dashboard</h3>
-                <p className="text-muted-foreground">
-                  After successful login, you'll be redirected to your personalized dashboard based on your user role.
-                </p>
+                <h3 className="font-medium">{t("login.step3.title")}</h3>
+                <p className="text-muted-foreground">{t("login.step3.description")}</p>
               </div>
             </CardContent>
           </Card>
@@ -171,56 +162,56 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <FileText className="h-5 w-5 text-green-600" />
-                Creating and Managing Contracts
+                {t("contracts.title")}
               </CardTitle>
-              <CardDescription>Learn how to create, view, and manage farming contracts</CardDescription>
+              <CardDescription>{t("contracts.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Creating a New Contract</h3>
+                <h3 className="font-medium">{t("contracts.create.title")}</h3>
                 <ol className="list-decimal pl-5 space-y-3 text-muted-foreground">
                   <li>
-                    <p className="font-medium text-foreground">Navigate to Contract Creation</p>
-                    <p>From your dashboard, click on "Contracts" in the sidebar, then select "Create New Contract".</p>
+                    <p className="font-medium text-foreground">{t("contracts.create.step1.title")}</p>
+                    <p>{t("contracts.create.step1.description")}</p>
                   </li>
                   <li>
-                    <p className="font-medium text-foreground">Fill in Contract Details</p>
-                    <p>Complete all required fields in the contract form:</p>
+                    <p className="font-medium text-foreground">{t("contracts.create.step2.title")}</p>
+                    <p>{t("contracts.create.step2.description")}</p>
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Contract Title</li>
-                      <li>Contract Type (Fixed Price, Revenue Sharing, etc.)</li>
-                      <li>Start and End Dates</li>
-                      <li>Crop Details (Type, Quantity, Quality Standards)</li>
-                      <li>Price Information</li>
-                      <li>Payment Terms</li>
-                      <li>Delivery Schedule</li>
+                      <li>{t("contracts.create.step2.field1")}</li>
+                      <li>{t("contracts.create.step2.field2")}</li>
+                      <li>{t("contracts.create.step2.field3")}</li>
+                      <li>{t("contracts.create.step2.field4")}</li>
+                      <li>{t("contracts.create.step2.field5")}</li>
+                      <li>{t("contracts.create.step2.field6")}</li>
+                      <li>{t("contracts.create.step2.field7")}</li>
                     </ul>
                   </li>
                   <li>
-                    <p className="font-medium text-foreground">Add Special Clauses (Optional)</p>
-                    <p>Include any special terms or conditions specific to your agreement.</p>
+                    <p className="font-medium text-foreground">{t("contracts.create.step3.title")}</p>
+                    <p>{t("contracts.create.step3.description")}</p>
                   </li>
                   <li>
-                    <p className="font-medium text-foreground">Review and Submit</p>
-                    <p>Carefully review all contract details before clicking "Create Contract".</p>
+                    <p className="font-medium text-foreground">{t("contracts.create.step4.title")}</p>
+                    <p>{t("contracts.create.step4.description")}</p>
                   </li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Viewing and Managing Contracts</h3>
-                <p className="text-muted-foreground">To view your existing contracts:</p>
+                <h3 className="font-medium">{t("contracts.manage.title")}</h3>
+                <p className="text-muted-foreground">{t("contracts.manage.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Go to "Contracts" "-"" "Contract List" in the sidebar</li>
-                  <li>Use filters to sort contracts by status, date, or type</li>
-                  <li>Click on any contract to view its details</li>
+                  <li>{t("contracts.manage.step1")}</li>
+                  <li>{t("contracts.manage.step2")}</li>
+                  <li>{t("contracts.manage.step3")}</li>
                   <li>
-                    From the contract details page, you can:
+                    {t("contracts.manage.step4")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Download the contract document</li>
-                      <li>View contract timeline and history</li>
-                      <li>Amend the contract (if permitted)</li>
-                      <li>Terminate the contract (if necessary)</li>
+                      <li>{t("contracts.manage.step4.action1")}</li>
+                      <li>{t("contracts.manage.step4.action2")}</li>
+                      <li>{t("contracts.manage.step4.action3")}</li>
+                      <li>{t("contracts.manage.step4.action4")}</li>
                     </ul>
                   </li>
                 </ol>
@@ -234,64 +225,64 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5 text-green-600" />
-                Using the Marketplace
+                {t("marketplace.title")}
               </CardTitle>
-              <CardDescription>Browse, create, and respond to marketplace listings</CardDescription>
+              <CardDescription>{t("marketplace.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Browsing the Marketplace</h3>
-                <p className="text-muted-foreground">To browse available listings:</p>
+                <h3 className="font-medium">{t("marketplace.browse.title")}</h3>
+                <p className="text-muted-foreground">{t("marketplace.browse.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Click on "Marketplace" in the main navigation</li>
+                  <li>{t("marketplace.browse.step1")}</li>
                   <li>
-                    Use filters to narrow down listings by:
+                    {t("marketplace.browse.step2")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Crop type</li>
-                      <li>Location</li>
-                      <li>Price range</li>
-                      <li>Quantity</li>
+                      <li>{t("marketplace.browse.filter1")}</li>
+                      <li>{t("marketplace.browse.filter2")}</li>
+                      <li>{t("marketplace.browse.filter3")}</li>
+                      <li>{t("marketplace.browse.filter4")}</li>
                     </ul>
                   </li>
-                  <li>Click on any listing card to view detailed information</li>
+                  <li>{t("marketplace.browse.step3")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Creating a Marketplace Listing</h3>
-                <p className="text-muted-foreground">To create a new listing:</p>
+                <h3 className="font-medium">{t("marketplace.create.title")}</h3>
+                <p className="text-muted-foreground">{t("marketplace.create.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>From the Marketplace page, click "Create Listing"</li>
+                  <li>{t("marketplace.create.step1")}</li>
                   <li>
-                    Fill in all required information:
+                    {t("marketplace.create.step2")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Listing title</li>
-                      <li>Product description</li>
-                      <li>Crop details (type, variety, certification)</li>
-                      <li>Quantity available</li>
-                      <li>Price per unit</li>
-                      <li>Location</li>
-                      <li>Availability dates</li>
+                      <li>{t("marketplace.create.field1")}</li>
+                      <li>{t("marketplace.create.field2")}</li>
+                      <li>{t("marketplace.create.field3")}</li>
+                      <li>{t("marketplace.create.field4")}</li>
+                      <li>{t("marketplace.create.field5")}</li>
+                      <li>{t("marketplace.create.field6")}</li>
+                      <li>{t("marketplace.create.field7")}</li>
                     </ul>
                   </li>
-                  <li>Upload product images (recommended)</li>
-                  <li>Add any certifications or quality documents</li>
-                  <li>Review and click "Publish Listing"</li>
+                  <li>{t("marketplace.create.step3")}</li>
+                  <li>{t("marketplace.create.step4")}</li>
+                  <li>{t("marketplace.create.step5")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Responding to Listings</h3>
-                <p className="text-muted-foreground">When you find a listing you're interested in:</p>
+                <h3 className="font-medium">{t("marketplace.respond.title")}</h3>
+                <p className="text-muted-foreground">{t("marketplace.respond.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Click "View Details" on the listing card</li>
-                  <li>Review all information on the detailed listing page</li>
+                  <li>{t("marketplace.respond.step1")}</li>
+                  <li>{t("marketplace.respond.step2")}</li>
                   <li>
-                    You can:
+                    {t("marketplace.respond.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Click "Contact Seller" to send a message</li>
-                      <li>Click "Negotiate" to propose different terms</li>
-                      <li>Click "View Document" to see any attached documents</li>
+                      <li>{t("marketplace.respond.action1")}</li>
+                      <li>{t("marketplace.respond.action2")}</li>
+                      <li>{t("marketplace.respond.action3")}</li>
                     </ul>
                   </li>
                 </ol>
@@ -305,70 +296,69 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <MessageSquare className="h-5 w-5 text-green-600" />
-                Negotiating Terms
+                {t("negotiation.title")}
               </CardTitle>
-              <CardDescription>How to negotiate prices and terms with other users</CardDescription>
+              <CardDescription>{t("negotiation.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Starting a Negotiation</h3>
-                <p className="text-muted-foreground">To negotiate on a marketplace listing:</p>
+                <h3 className="font-medium">{t("negotiation.start.title")}</h3>
+                <p className="text-muted-foreground">{t("negotiation.start.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Find a listing you're interested in</li>
-                  <li>Click the "Negotiate" button on the listing card or detail page</li>
+                  <li>{t("negotiation.start.step1")}</li>
+                  <li>{t("negotiation.start.step2")}</li>
                   <li>
-                    In the negotiation modal that appears:
+                    {t("negotiation.start.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>View the current price and quantity</li>
-                      <li>Enter your proposed price per unit</li>
-                      <li>Enter your proposed quantity</li>
-                      <li>Provide a reason for your negotiation (important for successful negotiations)</li>
+                      <li>{t("negotiation.start.field1")}</li>
+                      <li>{t("negotiation.start.field2")}</li>
+                      <li>{t("negotiation.start.field3")}</li>
+                      <li>{t("negotiation.start.field4")}</li>
                     </ul>
                   </li>
-                  <li>Review the total value comparison</li>
-                  <li>Click "Send Proposal" to submit your negotiation</li>
+                  <li>{t("negotiation.start.step4")}</li>
+                  <li>{t("negotiation.start.step5")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Responding to Negotiations</h3>
-                <p className="text-muted-foreground">When someone negotiates on your listing:</p>
+                <h3 className="font-medium">{t("negotiation.respond.title")}</h3>
+                <p className="text-muted-foreground">{t("negotiation.respond.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>You'll receive a notification in your dashboard</li>
-                  <li>Go to "Negotiations" in the sidebar</li>
+                  <li>{t("negotiation.respond.step1")}</li>
+                  <li>{t("negotiation.respond.step2")}</li>
                   <li>
-                    Review the negotiation details including:
+                    {t("negotiation.respond.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Original terms</li>
-                      <li>Proposed terms</li>
-                      <li>The buyer's reason for negotiation</li>
+                      <li>{t("negotiation.respond.detail1")}</li>
+                      <li>{t("negotiation.respond.detail2")}</li>
+                      <li>{t("negotiation.respond.detail3")}</li>
                     </ul>
                   </li>
                   <li>
-                    You can:
+                    {t("negotiation.respond.step4")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Accept the proposal as-is</li>
-                      <li>Reject the proposal</li>
-                      <li>Counter-offer with different terms</li>
-                      <li>Message the buyer for clarification</li>
+                      <li>{t("negotiation.respond.action1")}</li>
+                      <li>{t("negotiation.respond.action2")}</li>
+                      <li>{t("negotiation.respond.action3")}</li>
+                      <li>{t("negotiation.respond.action4")}</li>
                     </ul>
                   </li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Finalizing a Negotiation</h3>
-                <p className="text-muted-foreground">Once both parties agree on terms:</p>
+                <h3 className="font-medium">{t("negotiation.finalize.title")}</h3>
+                <p className="text-muted-foreground">{t("negotiation.finalize.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>The seller accepts the final proposal</li>
-                  <li>A contract is automatically generated with the agreed terms</li>
-                  <li>Both parties receive the contract for review</li>
-                  <li>After both parties sign, the transaction is created in the system</li>
+                  <li>{t("negotiation.finalize.step1")}</li>
+                  <li>{t("negotiation.finalize.step2")}</li>
+                  <li>{t("negotiation.finalize.step3")}</li>
+                  <li>{t("negotiation.finalize.step4")}</li>
                 </ol>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Tip:</strong> Always be clear and specific about your requirements during negotiation.
-                    Providing context for your proposed changes increases the likelihood of acceptance.
+                    <strong>Tip:</strong> {t("negotiation.finalize.tip")}
                   </p>
                 </div>
               </div>
@@ -381,79 +371,78 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BarChart3 className="h-5 w-5 text-green-600" />
-                Managing Transactions
+                {t("transactions.title")}
               </CardTitle>
-              <CardDescription>Track, process, and complete financial transactions</CardDescription>
+              <CardDescription>{t("transactions.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Viewing Your Transactions</h3>
-                <p className="text-muted-foreground">To access your transaction history:</p>
+                <h3 className="font-medium">{t("transactions.view.title")}</h3>
+                <p className="text-muted-foreground">{t("transactions.view.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Click on "Transactions" in the sidebar</li>
+                  <li>{t("transactions.view.step1")}</li>
                   <li>
-                    Use the tabs to filter between:
+                    {t("transactions.view.step2")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>"All Transactions" - Complete overview</li>
-                      <li>"Incoming" - Payments you're receiving</li>
-                      <li>"Outgoing" - Payments you're making</li>
+                      <li>{t("transactions.view.filter1")}</li>
+                      <li>{t("transactions.view.filter2")}</li>
+                      <li>{t("transactions.view.filter3")}</li>
                     </ul>
                   </li>
                   <li>
-                    Use additional filters to sort by:
+                    {t("transactions.view.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Date range</li>
-                      <li>Status (Pending, Completed, Failed)</li>
-                      <li>Amount</li>
+                      <li>{t("transactions.view.sort1")}</li>
+                      <li>{t("transactions.view.sort2")}</li>
+                      <li>{t("transactions.view.sort3")}</li>
                     </ul>
                   </li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Processing a Transaction</h3>
-                <p className="text-muted-foreground">To process a pending transaction:</p>
+                <h3 className="font-medium">{t("transactions.process.title")}</h3>
+                <p className="text-muted-foreground">{t("transactions.process.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Find the transaction in your list</li>
-                  <li>Click the "View" button to see transaction details</li>
+                  <li>{t("transactions.process.step1")}</li>
+                  <li>{t("transactions.process.step2")}</li>
                   <li>
-                    Review all information including:
+                    {t("transactions.process.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Transaction amount</li>
-                      <li>Related contract</li>
-                      <li>Payment terms</li>
-                      <li>Timeline</li>
+                      <li>{t("transactions.process.detail1")}</li>
+                      <li>{t("transactions.process.detail2")}</li>
+                      <li>{t("transactions.process.detail3")}</li>
+                      <li>{t("transactions.process.detail4")}</li>
                     </ul>
                   </li>
-                  <li>Click "Process" or "Confirm" button</li>
-                  <li>In the confirmation modal, verify details and click "Complete Transaction"</li>
-                  <li>The transaction status will update to "Completed"</li>
+                  <li>{t("transactions.process.step4")}</li>
+                  <li>{t("transactions.process.step5")}</li>
+                  <li>{t("transactions.process.step6")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Transaction Receipts and Documentation</h3>
-                <p className="text-muted-foreground">For record-keeping and compliance:</p>
+                <h3 className="font-medium">{t("transactions.receipt.title")}</h3>
+                <p className="text-muted-foreground">{t("transactions.receipt.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>After a transaction is completed, click "View" on the transaction</li>
-                  <li>Click "Download Receipt" to get a PDF receipt</li>
+                  <li>{t("transactions.receipt.step1")}</li>
+                  <li>{t("transactions.receipt.step2")}</li>
                   <li>
-                    The receipt includes:
+                    {t("transactions.receipt.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Transaction ID</li>
-                      <li>Date and time</li>
-                      <li>Parties involved</li>
-                      <li>Amount and currency</li>
-                      <li>Related contract reference</li>
-                      <li>Payment method</li>
+                      <li>{t("transactions.receipt.field1")}</li>
+                      <li>{t("transactions.receipt.field2")}</li>
+                      <li>{t("transactions.receipt.field3")}</li>
+                      <li>{t("transactions.receipt.field4")}</li>
+                      <li>{t("transactions.receipt.field5")}</li>
+                      <li>{t("transactions.receipt.field6")}</li>
                     </ul>
                   </li>
-                  <li>Store this receipt for your accounting and tax records</li>
+                  <li>{t("transactions.receipt.step4")}</li>
                 </ol>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Important:</strong> All transactions are recorded on the blockchain for transparency and
-                    security. Transaction records cannot be altered once completed.
+                    <strong>{t("transactions.receipt.important")}</strong>
                   </p>
                 </div>
               </div>
@@ -466,80 +455,79 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <UserCircle className="h-5 w-5 text-green-600" />
-                Managing Your Profile
+                {t("profile.title")}
               </CardTitle>
-              <CardDescription>Update your information and manage account settings</CardDescription>
+              <CardDescription>{t("profile.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Accessing Your Profile</h3>
-                <p className="text-muted-foreground">To view and edit your profile:</p>
+                <h3 className="font-medium">{t("profile.access.title")}</h3>
+                <p className="text-muted-foreground">{t("profile.access.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Click on your profile picture in the top-right corner</li>
-                  <li>Select "Profile" from the dropdown menu</li>
-                  <li>Alternatively, click on "Profile" in the sidebar</li>
+                  <li>{t("profile.access.step1")}</li>
+                  <li>{t("profile.access.step2")}</li>
+                  <li>{t("profile.access.step3")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Updating Personal Information</h3>
-                <p className="text-muted-foreground">To update your profile details:</p>
+                <h3 className="font-medium">{t("profile.update.title")}</h3>
+                <p className="text-muted-foreground">{t("profile.update.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>On your profile page, click the "Edit Profile" button</li>
+                  <li>{t("profile.update.step1")}</li>
                   <li>
-                    Update any of the following information:
+                    {t("profile.update.step2")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Profile picture</li>
-                      <li>Name</li>
-                      <li>Contact information</li>
-                      <li>Address</li>
-                      <li>Business details</li>
+                      <li>{t("profile.update.field1")}</li>
+                      <li>{t("profile.update.field2")}</li>
+                      <li>{t("profile.update.field3")}</li>
+                      <li>{t("profile.update.field4")}</li>
+                      <li>{t("profile.update.field5")}</li>
                     </ul>
                   </li>
-                  <li>Click "Save Changes" to update your profile</li>
+                  <li>{t("profile.update.step3")}</li>
                 </ol>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Note:</strong> Some information may require verification if changed, especially details used
-                    for identity verification.
+                    <strong>{t("profile.update.note")}</strong>
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Security Settings</h3>
-                <p className="text-muted-foreground">To manage your account security:</p>
+                <h3 className="font-medium">{t("profile.security.title")}</h3>
+                <p className="text-muted-foreground">{t("profile.security.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>On your profile page, go to the "Settings" tab</li>
+                  <li>{t("profile.security.step1")}</li>
                   <li>
-                    Under "Security", you can:
+                    {t("profile.security.step2")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Change your password</li>
-                      <li>Enable/disable two-factor authentication</li>
-                      <li>View login history</li>
-                      <li>Manage connected devices</li>
+                      <li>{t("profile.security.action1")}</li>
+                      <li>{t("profile.security.action2")}</li>
+                      <li>{t("profile.security.action3")}</li>
+                      <li>{t("profile.security.action4")}</li>
                     </ul>
                   </li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Notification Preferences</h3>
-                <p className="text-muted-foreground">To customize your notifications:</p>
+                <h3 className="font-medium">{t("profile.notification.title")}</h3>
+                <p className="text-muted-foreground">{t("profile.notification.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>On your profile page, go to the "Settings" tab</li>
+                  <li>{t("profile.notification.step1")}</li>
                   <li>
-                    Under "Notifications", you can toggle notifications for:
+                    {t("profile.notification.step2")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>New contract proposals</li>
-                      <li>Marketplace messages</li>
-                      <li>Transaction updates</li>
-                      <li>Price alerts</li>
-                      <li>System announcements</li>
+                      <li>{t("profile.notification.option1")}</li>
+                      <li>{t("profile.notification.option2")}</li>
+                      <li>{t("profile.notification.option3")}</li>
+                      <li>{t("profile.notification.option4")}</li>
+                      <li>{t("profile.notification.option5")}</li>
                     </ul>
                   </li>
-                  <li>Choose your preferred notification methods (email, SMS, in-app)</li>
-                  <li>Click "Save Preferences" to update your settings</li>
+                  <li>{t("profile.notification.step3")}</li>
+                  <li>{t("profile.notification.step4")}</li>
                 </ol>
               </div>
             </CardContent>
@@ -551,109 +539,102 @@ export default function UserGuide() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <CheckCircle className="h-5 w-5 text-green-600" />
-                Account Verification
+                {t("verification.title")}
               </CardTitle>
-              <CardDescription>Complete the verification process to unlock all platform features</CardDescription>
+              <CardDescription>{t("verification.description")}</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
               <div className="space-y-2">
-                <h3 className="font-medium">Why Verification is Important</h3>
-                <p className="text-muted-foreground">Account verification helps:</p>
+                <h3 className="font-medium">{t("verification.importance.title")}</h3>
+                <p className="text-muted-foreground">{t("verification.importance.description")}</p>
                 <ul className="list-disc pl-5 space-y-1 text-muted-foreground">
-                  <li>Establish trust between users on the platform</li>
-                  <li>Prevent fraud and ensure security</li>
-                  <li>Comply with regulatory requirements</li>
-                  <li>Unlock advanced features and higher transaction limits</li>
+                  <li>{t("verification.importance.reason1")}</li>
+                  <li>{t("verification.importance.reason2")}</li>
+                  <li>{t("verification.importance.reason3")}</li>
+                  <li>{t("verification.importance.reason4")}</li>
                 </ul>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Document Verification</h3>
-                <p className="text-muted-foreground">To verify your business documents:</p>
+                <h3 className="font-medium">{t("verification.document.title")}</h3>
+                <p className="text-muted-foreground">{t("verification.document.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Go to the "Verification" page after signup</li>
-                  <li>Select the "Documents" tab</li>
+                  <li>{t("verification.document.step1")}</li>
+                  <li>{t("verification.document.step2")}</li>
                   <li>
-                    Upload the following documents:
+                    {t("verification.document.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Business License/Registration</li>
-                      <li>Tax Certificate</li>
-                      <li>Bank Statement (not older than 3 months)</li>
+                      <li>{t("verification.document.doc1")}</li>
+                      <li>{t("verification.document.doc2")}</li>
+                      <li>{t("verification.document.doc3")}</li>
                     </ul>
                   </li>
                   <li>
-                    Ensure all documents are:
+                    {t("verification.document.step4")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Clear and legible</li>
-                      <li>Complete (no cut-off information)</li>
-                      <li>Valid and not expired</li>
+                      <li>{t("verification.document.req1")}</li>
+                      <li>{t("verification.document.req2")}</li>
+                      <li>{t("verification.document.req3")}</li>
                     </ul>
                   </li>
-                  <li>Click "Submit Documents" to proceed</li>
+                  <li>{t("verification.document.step5")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Identity Verification</h3>
-                <p className="text-muted-foreground">To verify your personal identity:</p>
+                <h3 className="font-medium">{t("verification.identity.title")}</h3>
+                <p className="text-muted-foreground">{t("verification.identity.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Go to the "Verification" page</li>
-                  <li>Select the "Identity" tab</li>
+                  <li>{t("verification.identity.step1")}</li>
+                  <li>{t("verification.identity.step2")}</li>
                   <li>
-                    Upload the following:
+                    {t("verification.identity.step3")}
                     <ul className="list-disc pl-5 mt-1 space-y-1">
-                      <li>Government-issued ID (passport, driver's license, or national ID)</li>
-                      <li>Proof of address (utility bill, bank statement)</li>
-                      <li>Selfie with your ID (follow the instructions on screen)</li>
+                      <li>{t("verification.identity.id1")}</li>
+                      <li>{t("verification.identity.id2")}</li>
+                      <li>{t("verification.identity.id3")}</li>
                     </ul>
                   </li>
-                  <li>Click "Verify Identity" to submit</li>
+                  <li>{t("verification.identity.step4")}</li>
                 </ol>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Privacy Note:</strong> All your verification documents are encrypted and stored securely.
-                    They are only used for verification purposes and are not shared with other users.
+                    <strong>{t("verification.identity.privacy")}</strong>
                   </p>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Verification Status</h3>
-                <p className="text-muted-foreground">After submitting your documents:</p>
+                <h3 className="font-medium">{t("verification.status.title")}</h3>
+                <p className="text-muted-foreground">{t("verification.status.description")}</p>
                 <ol className="list-decimal pl-5 space-y-2 text-muted-foreground">
-                  <li>Your verification status will show as "Pending"</li>
-                  <li>Our team will review your documents within 1-2 business days</li>
-                  <li>You'll receive an email notification once verification is complete</li>
-                  <li>If there are any issues, you'll be notified with instructions on what to correct</li>
+                  <li>{t("verification.status.step1")}</li>
+                  <li>{t("verification.status.step2")}</li>
+                  <li>{t("verification.status.step3")}</li>
+                  <li>{t("verification.status.step4")}</li>
                 </ol>
               </div>
 
               <div className="space-y-2">
-                <h3 className="font-medium">Verification Levels</h3>
-                <p className="text-muted-foreground">AgriContract has three verification levels:</p>
+                <h3 className="font-medium">{t("verification.levels.title")}</h3>
+                <p className="text-muted-foreground">{t("verification.levels.description")}</p>
                 <ul className="list-disc pl-5 space-y-2 text-muted-foreground">
                   <li>
-                    <p className="font-medium text-foreground">Level 1: Basic</p>
-                    <p>Email and phone verification. Limited access to platform features.</p>
+                    <p className="font-medium text-foreground">{t("verification.levels.level1.title")}</p>
+                    <p>{t("verification.levels.level1.description")}</p>
                   </li>
                   <li>
-                    <p className="font-medium text-foreground">Level 2: Standard</p>
-                    <p>
-                      Identity verification complete. Access to most platform features with moderate transaction limits.
-                    </p>
+                    <p className="font-medium text-foreground">{t("verification.levels.level2.title")}</p>
+                    <p>{t("verification.levels.level2.description")}</p>
                   </li>
                   <li>
-                    <p className="font-medium text-foreground">Level 3: Advanced</p>
-                    <p>
-                      Full business and document verification. Unlimited access to all features with highest transaction
-                      limits.
-                    </p>
+                    <p className="font-medium text-foreground">{t("verification.levels.level3.title")}</p>
+                    <p>{t("verification.levels.level3.description")}</p>
                   </li>
                 </ul>
                 <div className="rounded-md border p-4 bg-muted/50">
                   <p className="text-sm">
-                    <strong>Tip:</strong> Complete all verification steps as soon as possible to ensure seamless access
-                    to all platform features when you need them.
+                    <strong>{t("verification.levels.tip")}</strong>
                   </p>
                 </div>
               </div>
@@ -679,7 +660,7 @@ export default function UserGuide() {
           }}
           className="bg-green-600 hover:bg-green-700"
         >
-          Next Section
+          {t("guide.next")}
           <ArrowRight className="ml-2 h-4 w-4" />
         </Button>
       </div>

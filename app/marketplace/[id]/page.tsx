@@ -33,9 +33,9 @@ export default function MarketplaceListingDetails() {
     availableTo: new Date("2025-08-30"),
     harvestDate: new Date("2025-04-30"),
     images: [
-      "/placeholder.svg?height=500&width=800&text=Wheat",
-      "/placeholder.svg?height=500&width=800&text=Wheat Field",
-      "/placeholder.svg?height=500&width=800&text=Wheat Closeup",
+      "/wheat1.jpeg",
+      "/wheat2.jpeg",
+      "/paddy1.jpeg",
     ],
     seller: {
       id: "S-1001",
@@ -63,7 +63,7 @@ export default function MarketplaceListingDetails() {
         quantity: 3000,
         unit: "kg",
         pricePerUnit: 42.25,
-        image: "/placeholder.svg?height=150&width=200&text=Rice",
+        image: "/basmati rice.jpg",
       },
       {
         id: "M-1003",
@@ -72,7 +72,7 @@ export default function MarketplaceListingDetails() {
         quantity: 2000,
         unit: "kg",
         pricePerUnit: 28.75,
-        image: "/placeholder.svg?height=150&width=200&text=Corn",
+        image: "/corn.jpeg",
       },
       {
         id: "M-1004",
@@ -81,7 +81,7 @@ export default function MarketplaceListingDetails() {
         quantity: 4000,
         unit: "kg",
         pricePerUnit: 18.5,
-        image: "/placeholder.svg?height=150&width=200&text=Potatoes",
+        image: "/potato.jpeg",
       },
     ],
   }
@@ -106,7 +106,7 @@ export default function MarketplaceListingDetails() {
         <div className="md:col-span-2 space-y-6">
           {/* Product Images */}
           <div className="rounded-lg overflow-hidden border">
-            <img src={listing.images[0] || "/placeholder.svg"} alt={listing.title} className="w-full h-auto" />
+            <img src={listing.images[0] || "/Wheat.jpeg"} alt={listing.title} className="w-full h-auto" />
           </div>
 
           <div className="flex overflow-auto gap-2 pb-2">
@@ -228,7 +228,7 @@ export default function MarketplaceListingDetails() {
                     <div className="border rounded-lg overflow-hidden hover:border-primary transition-colors">
                       <div className="h-32 overflow-hidden">
                         <img
-                          src={item.image || "/placeholder.svg"}
+                          src={item.image || "/wheat1.jpeg"}
                           alt={item.title}
                           className="w-full h-full object-cover group-hover:scale-105 transition-transform"
                         />
