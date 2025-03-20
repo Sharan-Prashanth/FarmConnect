@@ -62,11 +62,11 @@ export default function ContactUs() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription>
-                      123 AgriTech Park, Farming District
+                      CIT Farming, Tamil Nadu
                       <br />
-                      Agricultural City, AC 12345
+                      Chennai - 600069
                       <br />
-                      Country
+                      India
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -77,11 +77,11 @@ export default function ContactUs() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription>
-                      General Inquiries: info@agricontract.com
+                      General Inquiries: FarmConnect@citchennai.com
                       <br />
-                      Support: support@agricontract.com
+                      Support: CIT_farm@citchennai.com
                       <br />
-                      Partnerships: partners@agricontract.com
+                      CEO: CIT_Chairman@citchennai.com
                     </CardDescription>
                   </CardContent>
                 </Card>
@@ -92,11 +92,11 @@ export default function ContactUs() {
                   </CardHeader>
                   <CardContent>
                     <CardDescription>
-                      Main Office: +1 (555) 123-4567
+                      Main Office: 444 222 2222
                       <br />
-                      Support Hotline: +1 (555) 987-6543
+                      Support Hotline: 0909 0920 220
                       <br />
-                      Hours: Monday-Friday, 9am-5pm
+                      24/7 Working
                     </CardDescription>
                   </CardContent>
                 </Card>

@@ -1,62 +1,79 @@
-"use client"
+"use client";
 
-import type React from "react"
-
-import { useState } from "react"
-import { ArrowRight, Calendar, LineChart, TrendingDown, TrendingUp } from "lucide-react"
-
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Label } from "@/components/ui/label"
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { PriceChart } from "@/components/price-chart"
+import React, { useState } from "react";
+import { ArrowRight, Calendar, LineChart, TrendingDown, TrendingUp } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { PriceChart } from "@/components/price-chart";
 
 export default function PricePredictor() {
-  const [crop, setCrop] = useState("wheat")
-  const [region, setRegion] = useState("midwest")
-  const [timeframe, setTimeframe] = useState("3months")
-  const [isLoading, setIsLoading] = useState(false)
-  const [predictionResult, setPredictionResult] = useState<any>(null)
+  const [crop, setCrop] = useState("wheat");
+  const [region, setRegion] = useState("midwest");
+  const [timeframe, setTimeframe] = useState("3months");
+  const [isLoading, setIsLoading] = useState(false);
+  const [predictionResult, setPredictionResult] = useState<any>(null);
+  const [data, setData] = useState<any>(null);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
-    event.preventDefault()
-    setIsLoading(true)
-
-    // Simulate API call for price prediction
-    setTimeout(() => {
-      setPredictionResult({
-        crop,
-        region,
-        predictedPrice: 875.25,
-        confidence: 85,
-        trend: "up",
-        factors: [
-          { name: "Weather Patterns", impact: 35 },
-          { name: "Global Demand", impact: 25 },
-          { name: "Fuel Prices", impact: 15 },
-          { name: "Seasonal Trends", impact: 15 },
-          { name: "Supply Chain", impact: 10 },
-        ],
-        historicalPrices: [
-          { month: "Jan", price: 720.5 },
-          { month: "Feb", price: 750.75 },
-          { month: "Mar", price: 780.25 },
-          { month: "Apr", price: 800.0 },
-          { month: "May", price: 820.5 },
-          { month: "Jun", price: 840.75 },
-          { month: "Jul", price: 850.25 },
-          { month: "Aug", price: 860.5 },
-          { month: "Sep", price: 870.75 },
-          { month: "Oct", price: 875.25 },
-          { month: "Nov", price: 890.5 },
-          { month: "Dec", price: 910.25 },
-        ],
-      })
-      setIsLoading(false)
-    }, 1500)
+    event.preventDefault();
+    setIsLoading(true);
+  
+    try {
+      const response = await fetch(`http://127.0.0.1:5000/predict?crop=${crop}`);
+      
+      // Check if the response is OK (status code 200-299)
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+  
+      const cp_sujan = await response.json(); // Parse the response as JSON
+  
+      // Log the response to debug its structure
+      console.log("API Response:", cp_sujan);
+  
+      // Access the predictions array from the response
+      const predictions = cp_sujan.predictions;
+  
+      // Ensure predictions is an array before calling .map()
+      if (!Array.isArray(predictions)) {
+        throw new Error("Expected an array but got a different data structure");
+      }
+  
+      // Transform the data to extract only the month and price (yhat)
+      const historicalPrices = predictions.map((item: any) => ({
+        month: new Date(item.ds).toLocaleString('default', { month: 'long' }), // Extract month name
+        price: item.yhat, // Extract price
+      }));
+  
+      setData(historicalPrices); // Set the transformed data
+  
+      setTimeout(() => {
+        setPredictionResult({
+          crop,
+          region,
+          predictedPrice: historicalPrices[0].price,
+          confidence: 85,
+          trend: "up",
+          factors: [
+            { name: "Weather Patterns", impact: 35 },
+            { name: "Global Demand", impact: 25 },
+            { name: "Fuel Prices", impact: 15 },
+            { name: "Seasonal Trends", impact: 15 },
+            { name: "Supply Chain", impact: 10 },
+          ],
+          historicalPrices: historicalPrices, // Use the transformed data here
+        });
+        setIsLoading(false);
+      }, 1500);
+    } catch (error) {
+      console.error("Error fetching or processing data:", error);
+      setIsLoading(false);
+    }
   }
-
+  
   return (
     <div className="flex flex-col min-h-screen">
       {/* Hero Section */}
@@ -99,11 +116,15 @@ export default function PricePredictor() {
                           <SelectValue placeholder="Select crop" />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="wheat">Wheat</SelectItem>
-                          <SelectItem value="corn">Corn</SelectItem>
-                          <SelectItem value="soybeans">Soybeans</SelectItem>
-                          <SelectItem value="rice">Rice</SelectItem>
-                          <SelectItem value="cotton">Cotton</SelectItem>
+                          <SelectItem value="Wheat">Wheat</SelectItem>
+                          <SelectItem value="Paddy">Paddy</SelectItem>
+                          <SelectItem value="Jowar">Jowar</SelectItem>
+                          <SelectItem value="Rice">Rice</SelectItem>
+                          <SelectItem value="Bajra">Bajra</SelectItem>
+                          <SelectItem value="Maize">Maize</SelectItem>
+                          <SelectItem value="Barley">Barley</SelectItem>
+                          <SelectItem value="Gram">Gram</SelectItem>
+                          <SelectItem value="Ragi">Ragi</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

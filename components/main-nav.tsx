@@ -33,6 +33,11 @@ export function MainNav() {
       label: "Contact",
       active: pathname === "/contact-us",
     },
+    {
+      href : "/user-guide",
+      label: "Instructions",
+      active : pathname === "/user-guide",
+    },
   ]
 
   return (

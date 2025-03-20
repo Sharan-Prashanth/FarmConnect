@@ -25,6 +25,13 @@ export default function ContractList() {
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   const [sortField, setSortField] = useState<"date" | "value">("date")
 
+  const route = useRouter();
+  const handlePayment = (
+    <Button onClick = {() => route.push("/payment")}>
+      Make Payment
+      </Button>
+  )
+
   useEffect(() => {
     const checkAuth = async () => {
       try {
@@ -718,9 +725,7 @@ export default function ContractList() {
                             <Button variant="outline" size="sm" asChild>
                               <Link href={`/contract-details/${contract.id}`}>View</Link>
                             </Button>
-                            <Button size="sm" className="bg-amber-600 hover:bg-amber-700">
-                              Resolve
-                            </Button>
+                            {handlePayment}
                           </div>
                         </TableCell>
                       </TableRow>

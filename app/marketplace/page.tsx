@@ -2,7 +2,8 @@
 
 import { useState } from "react"
 import { Filter, Search, SlidersHorizontal } from "lucide-react"
-
+import Link from 'next/link';
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -16,7 +17,25 @@ export default function Marketplace() {
   const [searchTerm, setSearchTerm] = useState("")
   const [priceRange, setPriceRange] = useState([0, 100])
   const [showFilters, setShowFilters] = useState(false)
+  const route = useRouter();
+  const router = useRouter();
+  const createListingButton = (
+    <Button className="bg-green-600 hover:bg-green-700" onClick={() => router.push("/contract-list/create")}>
+      Create a Listing
+    </Button>
+  );
 
+  const poda_angutu = (
+    <Button className="bg-green-600 hover:bg-green-700" onClick={() => route.push("/contract-list/create")}>
+      Create a Listing
+    </Button>
+  );
+
+  const lets_go = (
+    <Button onClick={() => route.push("/contract-list")}>
+      Browse Contracts
+    </Button>
+  )
   // Mock data for marketplace listings
   const listings = [
     {
@@ -293,11 +312,11 @@ export default function Marketplace() {
                     <path d="M3 21h18" />
                   </svg>
                 </div>
-                <h3 className="text-xl font-bold">Create a Listing</h3>
+                  <h3 className="text-xl font-bold">Create a Listing</h3>
                 <p className="text-center text-muted-foreground max-w-[600px]">
                   Start selling your agricultural products by creating a listing. Reach thousands of potential buyers.
                 </p>
-                <Button className="bg-green-600 hover:bg-green-700">Create Listing</Button>
+                {createListingButton}
               </div>
             </TabsContent>
 
@@ -328,8 +347,8 @@ export default function Marketplace() {
                   Browse contract farming opportunities or create your own contract offers.
                 </p>
                 <div className="flex gap-4">
-                  <Button variant="outline">Browse Contracts</Button>
-                  <Button className="bg-green-600 hover:bg-green-700">Create Contract</Button>
+                  {lets_go}
+                  {poda_angutu}
                 </div>
               </div>
             </TabsContent>

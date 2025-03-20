@@ -144,40 +144,6 @@ export default function About() {
         </div>
       </section>
 
-      {/* Team Section */}
-      <section className="w-full py-12 md:py-24 lg:py-32">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <div className="inline-block rounded-lg bg-green-100 px-3 py-1 text-sm dark:bg-green-800">Our Team</div>
-              <h2 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                Meet the People Behind AgriContract
-              </h2>
-              <p className="max-w-[700px] text-muted-foreground md:text-xl">
-                Our diverse team brings together expertise in agriculture, technology, and business.
-              </p>
-            </div>
-          </div>
-          <div className="mx-auto grid max-w-5xl grid-cols-1 gap-8 py-12 md:grid-cols-2 lg:grid-cols-3">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div key={i} className="flex flex-col items-center space-y-4">
-                <img
-                  src={`/placeholder.svg?height=200&width=200&text=Team Member ${i}`}
-                  width={200}
-                  height={200}
-                  alt={`Team Member ${i}`}
-                  className="rounded-full object-cover"
-                />
-                <div className="space-y-2 text-center">
-                  <h3 className="text-xl font-bold">Team Member {i}</h3>
-                  <p className="text-sm text-muted-foreground">Position</p>
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
       {/* CTA Section */}
       <section className="w-full py-12 md:py-24 lg:py-32 bg-green-50 dark:bg-green-950">
         <div className="container px-4 md:px-6">

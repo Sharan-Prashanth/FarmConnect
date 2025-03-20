@@ -5,8 +5,8 @@ const users: User[] = [
   // Add static user for testing
   {
     id: "static-user-id",
-    name: "Sharan Kumar",
-    email: "sharan@gmail.com",
+    name: "Farmer",
+    email: "farmer@gmail.com",
     password: "12345678", // In a real app, this would be hashed
     role: "farmer",
     phone: "+91 98765 43210",

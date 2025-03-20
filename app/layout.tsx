@@ -15,6 +15,11 @@ const inter = Inter({ subsets: ["latin"] })
 export const metadata = {
   title: "AgriContract - Contract Farming Platform",
   description: "A platform connecting farmers and buyers through assured contract farming agreements",
+  icons: {
+    icon: "/favicon.ico", // ✅ Correct path
+    shortcut: "/favicon.ico",
+    apple: "/favicon.ico",
+  },
 }
 
 export default function RootLayout({
