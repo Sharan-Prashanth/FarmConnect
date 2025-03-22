@@ -6,6 +6,8 @@ import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 import { ArrowLeft, CalendarIcon, Loader2 } from "lucide-react"
+import { format } from "date-fns"
+import { toast } from "sonner"
 
 import { Button } from "@/components/ui/button"
 import { Calendar as CalendarComponent } from "@/components/ui/calendar"
@@ -20,8 +22,14 @@ import { Separator } from "@/components/ui/separator"
 import { Textarea } from "@/components/ui/textarea"
 import { requireAuth } from "@/lib/auth"
 import { createContract } from "@/lib/contract-actions"
-import type { UserSession } from "@/lib/types"
+import type { Contract, UserSession, ContractStatus } from "@/lib/types"
 import { cn } from "@/lib/utils"
+
+function generateUniqueId() {
+  const timestamp = Date.now()
+  const random = Math.floor(Math.random() * 1000)
+  return `CONTRACT-${timestamp}${random}`
+}
 
 export default function CreateContract() {
   const router = useRouter()
@@ -64,65 +72,74 @@ export default function CreateContract() {
     checkAuth()
   }, [router])
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault()
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
     setIsSubmitting(true)
 
-    // Get form data
-    const formData = new FormData(e.currentTarget)
-
-    // Prepare contract data
-    const contractData = {
-      title: formData.get("title") as string,
-      description: formData.get("description") as string,
-
-      // Counterparty details
-      counterpartyName: formData.get("counterpartyName") as string,
-      counterpartyEmail: formData.get("counterpartyEmail") as string,
-      counterpartyPhone: formData.get("counterpartyPhone") as string,
-      counterpartyAddress: formData.get("counterpartyAddress") as string,
-      counterpartyType: counterpartyType,
-
-      // Set the appropriate IDs based on user role and counterparty type
-      farmerId: user?.role === "farmer" ? user.id : "",
-      buyerId: user?.role === "buyer" ? user.id : "",
-
-      // Crop details
-      crop: formData.get("crop") as string,
-      quantity: Number.parseFloat(formData.get("quantity") as string),
-      unit: formData.get("unit") as string,
-      pricePerUnit: Number.parseFloat(formData.get("pricePerUnit") as string),
-      totalPrice: totalPrice,
-
-      // Dates
-      deliveryDate: deliveryDate,
-      startDate: contractStartDate,
-      endDate: contractEndDate,
-
-      // Terms
-      paymentTerms: formData.get("paymentTerms") as string,
-      qualityParameters: formData.get("qualityParameters") as string,
-      additionalTerms: formData.get("additionalTerms") as string,
-
-      // Initial status
-      status: "draft",
-    }
-
     try {
-      // Call the server action to create the contract
-      const result = await createContract(contractData)
-
-      if (result.success) {
-        // Redirect to contract list with success message
-        router.push("/contract-list?success=created")
-      } else {
-        // Handle error
-        console.error("Error creating contract:", result.error)
-        // In a real app, you would show an error message to the user
+      // Get form data
+      const formElement = event.currentTarget
+      const formData = new FormData(formElement)
+      const data = {
+        title: formData.get("title") as string,
+        description: formData.get("description") as string,
+        counterpartyName: formData.get("counterpartyName") as string,
+        counterpartyEmail: formData.get("counterpartyEmail") as string,
+        counterpartyPhone: formData.get("counterpartyPhone") as string,
+        counterpartyAddress: formData.get("counterpartyAddress") as string,
+        counterpartyType: formData.get("counterpartyType") as string,
+        crop: formData.get("crop") as string,
+        quantity: formData.get("quantity") as string,
+        unit: formData.get("unit") as string,
+        pricePerUnit: formData.get("pricePerUnit") as string,
+        paymentTerms: formData.get("paymentTerms") as string,
+        qualityParameters: formData.get("qualityParameters") as string,
+        additionalTerms: formData.get("additionalTerms") as string,
+        deliveryDate: formData.get("deliveryDate") as string,
+        startDate: formData.get("startDate") as string,
+        endDate: formData.get("endDate") as string,
       }
+
+      // Create new contract with unique ID
+      const newContract: Contract = {
+        id: generateUniqueId(),
+        title: data.title,
+        description: data.description,
+        counterpartyName: data.counterpartyName,
+        counterpartyEmail: data.counterpartyEmail,
+        counterpartyPhone: data.counterpartyPhone,
+        counterpartyAddress: data.counterpartyAddress,
+        counterpartyType: data.counterpartyType === "buyer" ? "buyer" : "farmer",
+        farmerId: "FARMER-001", // Replace with actual farmer ID
+        buyerId: data.counterpartyType === "buyer" ? generateUniqueId() : "BUYER-001",
+        crop: data.crop,
+        quantity: Number(data.quantity),
+        unit: data.unit,
+        pricePerUnit: Number(data.pricePerUnit),
+        totalPrice: Number(data.quantity) * Number(data.pricePerUnit),
+        deliveryDate: new Date(data.deliveryDate),
+        startDate: new Date(data.startDate),
+        endDate: new Date(data.endDate),
+        paymentTerms: data.paymentTerms,
+        qualityParameters: data.qualityParameters,
+        additionalTerms: data.additionalTerms,
+        status: "draft" as ContractStatus,
+        progress: 0,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      }
+
+      // Save to localStorage
+      const existingContracts = localStorage.getItem('contracts')
+      const contracts = existingContracts ? JSON.parse(existingContracts) : []
+      contracts.push(newContract)
+      localStorage.setItem('contracts', JSON.stringify(contracts))
+
+      // Show success message and redirect
+      router.push("/contract-list?success=created")
     } catch (error) {
       console.error("Error creating contract:", error)
-      // Handle error state
+      toast.error("Failed to create contract")
     } finally {
       setIsSubmitting(false)
     }
@@ -587,19 +604,5 @@ export default function CreateContract() {
       </div>
     </div>
   )
-}
-
-// Helper function to format dates
-function format(date: Date, formatStr: string) {
-  const day = date.getDate()
-  const month = date.toLocaleString("default", { month: "long" })
-  const year = date.getFullYear()
-
-  // Simple implementation of PPP format (e.g., "April 29, 2023")
-  if (formatStr === "PPP") {
-    return `${month} ${day}, ${year}`
-  }
-
-  return date.toDateString()
 }
 

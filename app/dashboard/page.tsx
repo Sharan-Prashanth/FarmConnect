@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import {
@@ -9,6 +9,7 @@ import {
   Calendar,
   Clock,
   DollarSign,
+  Download,
   FileText,
   Handshake,
   Loader2,
@@ -22,12 +23,13 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { requireAuth } from "@/lib/auth"
-import type { UserSession } from "@/lib/types"
+import type { Contract, UserSession } from "@/lib/types"
 
 export default function Dashboard() {
   const router = useRouter()
   const [user, setUser] = useState<UserSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [contracts, setContracts] = useState<Contract[]>([])
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -43,174 +45,89 @@ export default function Dashboard() {
     checkAuth()
   }, [router])
 
-  // Mock data for dashboard
-  const dashboardData = {
-    stats: {
-      activeContracts: 3,
-      pendingContracts: 2,
-      totalValue: 2895000,
-      upcomingDeliveries: 2,
-    },
-    recentContracts: [
-      {
-        id: "C-1001",
-        title: "Premium Wheat Supply Contract",
-        counterparty: {
-          name: "Global Foods Inc.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Wheat",
-        quantity: "50 tons",
-        value: 1125000,
-        status: "Active",
-        progress: 40,
-        nextDelivery: "2023-09-15",
-      },
-      {
-        id: "C-1002",
-        title: "Organic Rice Supply Agreement",
-        counterparty: {
-          name: "Healthy Foods Co.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Rice",
-        quantity: "30 tons",
-        value: 1050000,
-        status: "Active",
-        progress: 15,
-        nextDelivery: "2023-09-20",
-      },
-      {
-        id: "C-1003",
-        title: "Premium Potato Supply Contract",
-        counterparty: {
-          name: "Crisp Chips Ltd.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Potatoes",
-        quantity: "40 tons",
-        value: 720000,
-        status: "Active",
-        progress: 25,
-        nextDelivery: "2023-09-10",
-      },
-    ],
-    recentTransactions: [
-      {
-        id: "T-1001",
-        contractId: "C-1001",
-        amount: 770000,
-        type: "advance",
-        status: "completed",
-        date: "2023-07-01",
-        from: {
-          name: "Global Foods Inc.",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-      },
-      {
-        id: "T-1002",
-        contractId: "C-1001",
-        amount: 330000,
-        type: "partial",
-        status: "pending",
-        date: "2023-09-15",
-        from: {
-          name: "Global Foods Inc.",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-      },
-      {
-        id: "T-1003",
-        contractId: "C-1002",
-        amount: 735000,
-        type: "advance",
-        status: "completed",
-        date: "2023-06-15",
-        from: {
-          name: "Healthy Foods Co.",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-      },
-    ],
-    marketplaceActivity: [
-      {
-        id: "M-1001",
-        title: "Premium Organic Wheat",
-        crop: "Wheat",
-        quantity: 5000,
-        unit: "kg",
-        pricePerUnit: 0.75,
-        image: "/placeholder.svg?height=40&width=40&text=Wheat",
-        date: "2023-08-25",
-        status: "active",
-      },
-      {
-        id: "M-1002",
-        title: "Fresh Corn Harvest",
-        crop: "Corn",
-        quantity: 10000,
-        unit: "kg",
-        pricePerUnit: 0.45,
-        image: "/placeholder.svg?height=40&width=40&text=Corn",
-        date: "2023-08-20",
-        status: "active",
-      },
-    ],
-    pricePredictions: [
-      {
-        crop: "Wheat",
-        currentPrice: 22.5,
-        predictedPrice: 24.8,
-        change: 10.2,
-        trend: "up",
-      },
-      {
-        crop: "Rice",
-        currentPrice: 35.0,
-        predictedPrice: 37.5,
-        change: 7.1,
-        trend: "up",
-      },
-      {
-        crop: "Potatoes",
-        currentPrice: 18.0,
-        predictedPrice: 16.5,
-        change: -8.3,
-        trend: "down",
-      },
-    ],
-    upcomingTasks: [
-      {
-        id: "T-1",
-        title: "Wheat delivery to Global Foods Inc.",
-        dueDate: "2023-09-15",
-        priority: "high",
-      },
-      {
-        id: "T-2",
-        title: "Rice quality inspection",
-        dueDate: "2023-09-10",
-        priority: "medium",
-      },
-      {
-        id: "T-3",
-        title: "Review new contract proposal",
-        dueDate: "2023-09-05",
-        priority: "medium",
-      },
-    ],
+  useEffect(() => {
+    const loadContracts = async () => {
+      try {
+        // Get static contracts
+        const staticContracts = [
+          {
+            id: "CONTRACT-001",
+            title: "Organic Wheat Supply Agreement",
+            description: "Supply of premium organic wheat",
+            counterpartyName: "Green Valley Foods",
+            counterpartyEmail: "contact@greenvalley.com",
+            counterpartyPhone: "+91 98765 43210",
+            counterpartyAddress: "123 Business Park, Mumbai",
+            counterpartyType: "buyer",
+            farmerId: "FARMER-001",
+            buyerId: "BUYER-001",
+            crop: "wheat",
+            quantity: 5000,
+            unit: "kg",
+            pricePerUnit: 25,
+            totalPrice: 125000,
+            deliveryDate: new Date("2024-06-15"),
+            startDate: new Date("2024-03-01"),
+            endDate: new Date("2024-06-30"),
+            paymentTerms: "advance-partial-final",
+            qualityParameters: "Grade A wheat with 12% moisture content",
+            additionalTerms: "Delivery at buyer's warehouse",
+            status: "active" as const,
+            progress: 45,
+            createdAt: new Date("2024-03-01"),
+            updatedAt: new Date("2024-03-15")
+          }
+        ]
+
+        // Get user-created contracts from localStorage
+        let userContracts = []
+        try {
+          const storedContracts = localStorage.getItem('contracts')
+          if (storedContracts) {
+            userContracts = JSON.parse(storedContracts)
+          }
+        } catch (error) {
+          console.error("Error reading from localStorage:", error)
+          userContracts = []
+        }
+
+        // Combine static and user contracts
+        const allContracts = [...staticContracts, ...userContracts]
+        setContracts(allContracts)
+      } catch (error) {
+        console.error("Error loading contracts:", error)
+      }
+    }
+
+    loadContracts()
+  }, [])
+
+  // Calculate contract statistics
+  const stats = {
+    activeContracts: contracts.filter(c => c.status === "active").length,
+    pendingContracts: contracts.filter(c => c.status === "draft" || c.status === "pending").length,
+    totalValue: contracts.reduce((sum, contract) => sum + contract.totalPrice, 0),
+    upcomingDeliveries: contracts.filter(c => {
+      const deliveryDate = new Date(c.deliveryDate)
+      const today = new Date()
+      const thirtyDaysFromNow = new Date()
+      thirtyDaysFromNow.setDate(today.getDate() + 30)
+      return c.status === "active" && deliveryDate >= today && deliveryDate <= thirtyDaysFromNow
+    }).length
   }
+
+  // Get recent contracts (last 3 active or pending)
+  const recentContracts = contracts
+    .filter(c => c.status === "active" || c.status === "draft" || c.status === "pending")
+    .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+    .slice(0, 3)
 
   if (isLoading) {
     return (
       <div className="flex min-h-screen items-center justify-center">
         <div className="flex flex-col items-center gap-2">
           <Loader2 className="h-8 w-8 animate-spin text-green-600" />
-          <p className="text-sm text-muted-foreground">Loading dashboard...</p>
+          <p className="text-sm text-muted-foreground">Loading...</p>
         </div>
       </div>
     )
@@ -232,8 +149,8 @@ export default function Dashboard() {
             <Handshake className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.stats.activeContracts}</div>
-            <p className="text-xs text-muted-foreground">{dashboardData.stats.pendingContracts} pending approval</p>
+            <div className="text-2xl font-bold">{stats.activeContracts}</div>
+            <p className="text-xs text-muted-foreground">{stats.pendingContracts} pending approval</p>
           </CardContent>
         </Card>
         <Card>
@@ -242,33 +159,32 @@ export default function Dashboard() {
             <DollarSign className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">₹{(dashboardData.stats.totalValue / 100000).toFixed(2)}L</div>
-            <p className="text-xs text-muted-foreground">+18.2% from last month</p>
+            <div className="text-2xl font-bold">₹{(stats.totalValue / 100000).toFixed(2)}L</div>
+            <p className="text-xs text-muted-foreground">Total value of all contracts</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
             <CardTitle className="text-sm font-medium">Upcoming Deliveries</CardTitle>
-            <Calendar className="h-4 w-4 text-muted-foreground" />
+            <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{dashboardData.stats.upcomingDeliveries}</div>
-            <p className="text-xs text-muted-foreground">Next delivery on Sep 10</p>
+            <div className="text-2xl font-bold">{stats.upcomingDeliveries}</div>
+            <p className="text-xs text-muted-foreground">Due in next 30 days</p>
           </CardContent>
         </Card>
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-            <CardTitle className="text-sm font-medium">Price Trends</CardTitle>
-            <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            <CardTitle className="text-sm font-medium">Total Contracts</CardTitle>
+            <FileText className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-green-600">+8.5%</div>
-            <p className="text-xs text-muted-foreground">Average crop price increase</p>
+            <div className="text-2xl font-bold">{contracts.length}</div>
+            <p className="text-xs text-muted-foreground">All time contracts</p>
           </CardContent>
         </Card>
       </div>
 
-      {/* Main Content */}
       <div className="grid gap-6 md:grid-cols-6">
         {/* Left Column - 4/6 width */}
         <div className="md:col-span-4 space-y-6">
@@ -276,8 +192,8 @@ export default function Dashboard() {
           <Card>
             <CardHeader className="flex flex-row items-center justify-between">
               <div>
-                <CardTitle>Active Contracts</CardTitle>
-                <CardDescription>Your ongoing contract farming agreements</CardDescription>
+                <CardTitle>Recent Contracts</CardTitle>
+                <CardDescription>Your recent contract farming agreements</CardDescription>
               </div>
               <Button asChild variant="outline" size="sm">
                 <Link href="/contract-list">
@@ -288,102 +204,55 @@ export default function Dashboard() {
             </CardHeader>
             <CardContent>
               <div className="space-y-6">
-                {dashboardData.recentContracts.map((contract) => (
+                {recentContracts.map((contract) => (
                   <div key={contract.id} className="flex flex-col space-y-2">
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2">
                         <Avatar className="h-8 w-8">
-                          <AvatarImage src={contract.counterparty.avatar} alt={contract.counterparty.name} />
-                          <AvatarFallback>{contract.counterparty.name.charAt(0)}</AvatarFallback>
+                          <AvatarFallback>{contract.counterpartyName.charAt(0)}</AvatarFallback>
                         </Avatar>
                         <div>
                           <div className="font-medium">{contract.title}</div>
                           <div className="text-sm text-muted-foreground">
-                            {contract.crop} • {contract.quantity}
+                            {contract.crop} • {contract.quantity} {contract.unit}
                           </div>
                         </div>
                       </div>
                       <Badge variant="default">{contract.status}</Badge>
                     </div>
-                    <div className="flex items-center justify-between text-sm">
-                      <div className="flex items-center gap-2">
-                        <div className="h-2 w-24 rounded-full bg-muted">
-                          <div
-                            className="h-full rounded-full bg-green-600"
-                            style={{ width: `${contract.progress}%` }}
-                          />
-                        </div>
-                        <span className="text-muted-foreground">{contract.progress}% Complete</span>
+                    <div className="flex items-center gap-2">
+                      <div className="h-2 w-24 rounded-full bg-muted">
+                        <div
+                          className="h-full rounded-full bg-green-600"
+                          style={{ width: `${contract.progress || 0}%` }}
+                        />
                       </div>
-                      <div className="flex items-center gap-1">
-                        <Clock className="h-3 w-3 text-muted-foreground" />
-                        <span className="text-muted-foreground">Next: {contract.nextDelivery}</span>
-                      </div>
-                      <div className="font-medium">₹{(contract.value / 100000).toFixed(2)}L</div>
+                      <span className="text-muted-foreground">{contract.progress || 0}% Complete</span>
                     </div>
+                    <div className="flex items-center gap-1">
+                      <Clock className="h-3 w-3 text-muted-foreground" />
+                      <span className="text-muted-foreground">
+                        Delivery: {new Date(contract.deliveryDate).toLocaleDateString()}
+                      </span>
+                    </div>
+                    <div className="font-medium">₹{(contract.totalPrice / 100000).toFixed(2)}L</div>
                   </div>
                 ))}
+                {recentContracts.length === 0 && (
+                  <div className="text-center py-8 text-muted-foreground">
+                    <p>No contracts found. Create your first contract to get started.</p>
+                  </div>
+                )}
               </div>
             </CardContent>
             <CardFooter>
               <Button className="w-full bg-green-600 hover:bg-green-700" asChild>
-                <Link href="/contract-list?action=new">
+                <Link href="/contract-list/create">
                   <Plus className="mr-2 h-4 w-4" />
                   Create New Contract
                 </Link>
               </Button>
             </CardFooter>
-          </Card>
-
-          {/* Recent Transactions */}
-          <Card>
-            <CardHeader className="flex flex-row items-center justify-between">
-              <div>
-                <CardTitle>Recent Transactions</CardTitle>
-                <CardDescription>Your latest financial activities</CardDescription>
-              </div>
-              <Button asChild variant="outline" size="sm">
-                <Link href="/transaction-list">
-                  View All
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {dashboardData.recentTransactions.map((transaction) => (
-                  <div key={transaction.id} className="flex items-center justify-between">
-                    <div className="flex items-center gap-4">
-                      <Avatar className="h-9 w-9">
-                        <AvatarImage src={transaction.from.avatar} alt={transaction.from.name} />
-                        <AvatarFallback>{transaction.from.name.charAt(0)}</AvatarFallback>
-                      </Avatar>
-                      <div>
-                        <div className="font-medium">
-                          {transaction.type.charAt(0).toUpperCase() + transaction.type.slice(1)} Payment
-                        </div>
-                        <div className="text-sm text-muted-foreground">
-                          From {transaction.from.name} • {transaction.date}
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex items-center gap-4">
-                      <Badge
-                        variant={transaction.status === "completed" ? "success" : "outline"}
-                        className={
-                          transaction.status === "completed"
-                            ? "bg-green-50 text-green-700 dark:bg-green-900 dark:text-green-300"
-                            : ""
-                        }
-                      >
-                        {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
-                      </Badge>
-                      <div className="font-medium text-right">₹{(transaction.amount / 1000).toFixed(0)}K</div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
           </Card>
         </div>
 
@@ -414,134 +283,6 @@ export default function Dashboard() {
                 </Link>
               </Button>
             </CardContent>
-          </Card>
-
-          {/* Upcoming Tasks */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Upcoming Tasks</CardTitle>
-              <CardDescription>Tasks requiring your attention</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {dashboardData.upcomingTasks.map((task) => (
-                  <div key={task.id} className="flex items-center">
-                    <div
-                      className={`mr-2 h-2 w-2 rounded-full ${
-                        task.priority === "high"
-                          ? "bg-red-500"
-                          : task.priority === "medium"
-                            ? "bg-amber-500"
-                            : "bg-green-500"
-                      }`}
-                    />
-                    <div className="flex-1 space-y-1">
-                      <p className="text-sm font-medium leading-none">{task.title}</p>
-                      <p className="text-xs text-muted-foreground">Due on {task.dueDate}</p>
-                    </div>
-                    <Button variant="ghost" size="sm">
-                      View
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          {/* Price Predictions */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Price Predictions</CardTitle>
-              <CardDescription>Forecasted crop prices</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {dashboardData.pricePredictions.map((prediction, index) => (
-                  <div key={index} className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="h-8 w-8 rounded-full bg-muted flex items-center justify-center">
-                        <span className="text-xs font-medium">{prediction.crop.charAt(0)}</span>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium">{prediction.crop}</p>
-                        <p className="text-xs text-muted-foreground">Current: ₹{prediction.currentPrice.toFixed(2)}</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-medium">₹{prediction.predictedPrice.toFixed(2)}</p>
-                      <div
-                        className={`flex items-center text-xs ${
-                          prediction.trend === "up" ? "text-green-600" : "text-red-600"
-                        }`}
-                      >
-                        {prediction.trend === "up" ? (
-                          <TrendingUp className="mr-1 h-3 w-3" />
-                        ) : (
-                          <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            width="24"
-                            height="24"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                            className="mr-1 h-3 w-3"
-                          >
-                            <polyline points="22 17 13.5 8.5 8.5 13.5 2 7" />
-                            <polyline points="16 17 22 17 22 11" />
-                          </svg>
-                        )}
-                        <span>{prediction.change}%</span>
-                      </div>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/price-predictor">View Detailed Analysis</Link>
-              </Button>
-            </CardFooter>
-          </Card>
-
-          {/* Marketplace Activity */}
-          <Card>
-            <CardHeader>
-              <CardTitle>Marketplace Activity</CardTitle>
-              <CardDescription>Recent listings and opportunities</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                {dashboardData.marketplaceActivity.map((listing) => (
-                  <div key={listing.id} className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-md overflow-hidden">
-                      <img
-                        src={listing.image || "/placeholder.svg"}
-                        alt={listing.crop}
-                        className="h-full w-full object-cover"
-                      />
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-medium">{listing.title}</p>
-                      <p className="text-xs text-muted-foreground">
-                        {listing.quantity} {listing.unit} • ₹{listing.pricePerUnit.toFixed(2)}/{listing.unit}
-                      </p>
-                    </div>
-                    <Badge variant="outline" className="capitalize">
-                      {listing.status}
-                    </Badge>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-            <CardFooter>
-              <Button variant="outline" className="w-full" asChild>
-                <Link href="/marketplace">Browse Marketplace</Link>
-              </Button>
-            </CardFooter>
           </Card>
         </div>
       </div>

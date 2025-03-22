@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter, useSearchParams } from "next/navigation"
 import { ArrowUpDown, Download, Filter, Loader2, Plus, Search } from "lucide-react"
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -14,23 +14,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { requireAuth } from "@/lib/auth"
-import type { UserSession } from "@/lib/types"
+import type { UserSession, Contract, ContractStatus } from "@/lib/types"
+import { fetchContracts } from "@/lib/contract-actions"
+import { toast } from "sonner"
 
 export default function ContractList() {
   const router = useRouter()
+  const searchParams = useSearchParams()
   const [user, setUser] = useState<UserSession | null>(null)
   const [isLoading, setIsLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState("")
   const [statusFilter, setStatusFilter] = useState("all")
   const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc")
   const [sortField, setSortField] = useState<"date" | "value">("date")
-
-  const route = useRouter();
-  const handlePayment = (
-    <Button onClick = {() => route.push("/payment")}>
-      Make Payment
-      </Button>
-  )
+  const [contracts, setContracts] = useState<Contract[]>([])
 
   useEffect(() => {
     const checkAuth = async () => {
@@ -46,188 +43,227 @@ export default function ContractList() {
     checkAuth()
   }, [router])
 
-  // Mock data for contracts
-  const mockContracts = {
-    active: [
-      {
-        id: "C-1001",
-        title: "Premium Wheat Supply Contract",
-        counterparty: {
-          name: "Global Foods Inc.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
+  // Move loadContracts outside useEffect so it can be reused
+  const loadContracts = async () => {
+    try {
+      // Define static contracts with proper date handling
+      const staticContracts: Contract[] = [
+        {
+          id: "CONTRACT-001",
+          title: "Organic Wheat Supply Agreement",
+          description: "Supply of premium organic wheat",
+          counterpartyName: "Green Valley Foods",
+          counterpartyEmail: "contact@greenvalley.com",
+          counterpartyPhone: "+91 98765 43210",
+          counterpartyAddress: "123 Business Park, Mumbai",
+          counterpartyType: "buyer",
+          farmerId: "FARMER-001",
+          buyerId: "BUYER-001",
+          crop: "wheat",
+          quantity: 5000,
+          unit: "kg",
+          pricePerUnit: 25,
+          totalPrice: 125000,
+          deliveryDate: new Date("2024-06-15"),
+          startDate: new Date("2024-03-01"),
+          endDate: new Date("2024-06-30"),
+          paymentTerms: "advance-partial-final",
+          qualityParameters: "Grade A wheat with 12% moisture content",
+          additionalTerms: "Delivery at buyer's warehouse",
+          status: "active" as ContractStatus,
+          progress: 45,
+          createdAt: new Date("2024-03-01T00:00:00Z"),
+          updatedAt: new Date("2024-03-15T00:00:00Z")
         },
-        crop: "Wheat",
-        quantity: "50 tons",
-        pricePerUnit: 22.5,
-        totalValue: 1125000,
-        startDate: "2023-07-01",
-        endDate: "2023-12-31",
-        status: "Active",
-        progress: 40,
-        nextDelivery: "2023-09-15",
-      },
-      {
-        id: "C-1002",
-        title: "Organic Rice Supply Agreement",
-        counterparty: {
-          name: "Healthy Foods Co.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
+        {
+          id: "CONTRACT-002",
+          title: "Rice Procurement Contract",
+          description: "Long-term rice supply agreement",
+          counterpartyName: "Agro Traders Ltd",
+          counterpartyEmail: "procurement@agrotraders.com",
+          counterpartyPhone: "+91 98765 43211",
+          counterpartyAddress: "456 Industrial Area, Delhi",
+          counterpartyType: "buyer",
+          farmerId: "FARMER-001",
+          buyerId: "BUYER-002",
+          crop: "rice",
+          quantity: 10000,
+          unit: "kg",
+          pricePerUnit: 35,
+          totalPrice: 350000,
+          deliveryDate: new Date("2024-08-20"),
+          startDate: new Date("2024-04-01"),
+          endDate: new Date("2024-08-31"),
+          paymentTerms: "advance-final",
+          qualityParameters: "Premium basmati rice with 14% moisture content",
+          additionalTerms: "Transportation cost borne by buyer",
+          status: "pending" as ContractStatus,
+          progress: 0,
+          createdAt: new Date("2024-03-10T00:00:00Z"),
+          updatedAt: new Date("2024-03-10T00:00:00Z")
         },
-        crop: "Rice",
-        quantity: "30 tons",
-        pricePerUnit: 35.0,
-        totalValue: 1050000,
-        startDate: "2023-06-15",
-        endDate: "2024-06-14",
-        status: "Active",
-        progress: 15,
-        nextDelivery: "2023-09-20",
-      },
-      {
-        id: "C-1003",
-        title: "Premium Potato Supply Contract",
-        counterparty: {
-          name: "Crisp Chips Ltd.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
+        {
+          id: "CONTRACT-003",
+          title: "Tomato Supply Agreement",
+          description: "Seasonal tomato supply contract",
+          counterpartyName: "Fresh Market Co",
+          counterpartyEmail: "orders@freshmarket.com",
+          counterpartyPhone: "+91 98765 43212",
+          counterpartyAddress: "789 Market Street, Bangalore",
+          counterpartyType: "buyer",
+          farmerId: "FARMER-001",
+          buyerId: "BUYER-003",
+          crop: "tomatoes",
+          quantity: 2000,
+          unit: "kg",
+          pricePerUnit: 40,
+          totalPrice: 80000,
+          deliveryDate: new Date("2024-05-10"),
+          startDate: new Date("2024-03-15"),
+          endDate: new Date("2024-05-15"),
+          paymentTerms: "delivery-payment",
+          qualityParameters: "Fresh, ripe tomatoes without blemishes",
+          additionalTerms: "Daily delivery schedule to be maintained",
+          status: "completed" as ContractStatus,
+          progress: 100,
+          createdAt: new Date("2024-02-15T00:00:00Z"),
+          updatedAt: new Date("2024-05-15T00:00:00Z")
         },
-        crop: "Potatoes",
-        quantity: "40 tons",
-        pricePerUnit: 18.0,
-        totalValue: 720000,
-        startDate: "2023-08-01",
-        endDate: "2023-10-31",
-        status: "Active",
-        progress: 25,
-        nextDelivery: "2023-09-10",
-      },
-    ],
-    pending: [
-      {
-        id: "C-1101",
-        title: "Maize Supply Contract",
-        counterparty: {
-          name: "FeedCo Industries",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
+        {
+          id: "CONTRACT-004",
+          title: "Cotton Farming Contract",
+          description: "Premium cotton supply agreement",
+          counterpartyName: "Textile Industries Ltd",
+          counterpartyEmail: "procurement@textileindustries.com",
+          counterpartyPhone: "+91 98765 43213",
+          counterpartyAddress: "321 Industrial Estate, Chennai",
+          counterpartyType: "buyer",
+          farmerId: "FARMER-001",
+          buyerId: "BUYER-004",
+          crop: "cotton",
+          quantity: 3000,
+          unit: "kg",
+          pricePerUnit: 60,
+          totalPrice: 180000,
+          deliveryDate: new Date("2024-09-15"),
+          startDate: new Date("2024-05-01"),
+          endDate: new Date("2024-09-30"),
+          paymentTerms: "partial-payments",
+          qualityParameters: "Grade A cotton with 8% moisture content",
+          additionalTerms: "Quality check at delivery point",
+          status: "negotiating" as ContractStatus,
+          progress: 20,
+          createdAt: new Date("2024-04-01T00:00:00Z"),
+          updatedAt: new Date("2024-04-15T00:00:00Z")
         },
-        crop: "Maize",
-        quantity: "45 tons",
-        pricePerUnit: 19.0,
-        totalValue: 855000,
-        proposedStartDate: "2023-10-01",
-        proposedEndDate: "2024-03-31",
-        status: "Pending Approval",
-        submittedDate: "2023-08-25",
-      },
-      {
-        id: "C-1102",
-        title: "Soybean Purchase Agreement",
-        counterparty: {
-          name: "OilPress Ltd.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Soybeans",
-        quantity: "25 tons",
-        pricePerUnit: 42.0,
-        totalValue: 1050000,
-        proposedStartDate: "2023-11-01",
-        proposedEndDate: "2024-04-30",
-        status: "In Negotiation",
-        submittedDate: "2023-08-20",
-      },
-    ],
-    completed: [
-      {
-        id: "C-0901",
-        title: "Tomato Supply Contract",
-        counterparty: {
-          name: "Fresh Sauce Co.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Tomatoes",
-        quantity: "20 tons",
-        pricePerUnit: 25.0,
-        totalValue: 500000,
-        startDate: "2023-01-01",
-        endDate: "2023-05-31",
-        status: "Completed",
-        finalPayment: "₹5,00,000",
-        completionDate: "2023-05-31",
-      },
-      {
-        id: "C-0902",
-        title: "Onion Supply Agreement",
-        counterparty: {
-          name: "Global Exports Ltd.",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Onions",
-        quantity: "35 tons",
-        pricePerUnit: 20.0,
-        totalValue: 700000,
-        startDate: "2023-02-15",
-        endDate: "2023-06-15",
-        status: "Completed",
-        finalPayment: "₹7,00,000",
-        completionDate: "2023-06-15",
-      },
-    ],
-    disputed: [
-      {
-        id: "C-0801",
-        title: "Sugarcane Supply Contract",
-        counterparty: {
-          name: "SweetSugar Mills",
-          type: "Buyer",
-          avatar: "/placeholder.svg?height=40&width=40",
-        },
-        crop: "Sugarcane",
-        quantity: "100 tons",
-        pricePerUnit: 31.0,
-        totalValue: 3100000,
-        startDate: "2023-03-01",
-        endDate: "2023-09-30",
-        status: "Disputed",
-        disputeReason: "Quality issues with last delivery",
-        disputeDate: "2023-08-15",
-      },
-    ],
+        {
+          id: "CONTRACT-005",
+          title: "Sugarcane Supply Contract",
+          description: "Long-term sugarcane supply agreement",
+          counterpartyName: "Sugar Mills Co",
+          counterpartyEmail: "procurement@sugarmills.com",
+          counterpartyPhone: "+91 98765 43214",
+          counterpartyAddress: "654 Sugar Estate, Uttar Pradesh",
+          counterpartyType: "buyer",
+          farmerId: "FARMER-001",
+          buyerId: "BUYER-005",
+          crop: "sugarcane",
+          quantity: 50000,
+          unit: "kg",
+          pricePerUnit: 3.5,
+          totalPrice: 175000,
+          deliveryDate: new Date("2024-12-20"),
+          startDate: new Date("2024-06-01"),
+          endDate: new Date("2024-12-31"),
+          paymentTerms: "advance-partial-final",
+          qualityParameters: "Sugarcane with 12% sucrose content",
+          additionalTerms: "Transportation arranged by buyer",
+          status: "disputed" as ContractStatus,
+          progress: 30,
+          createdAt: new Date("2024-05-01T00:00:00Z"),
+          updatedAt: new Date("2024-05-15T00:00:00Z"),
+          disputeReason: "Quality standards not met"
+        }
+      ]
+
+      // Get user-created contracts from localStorage
+      let userContracts: Contract[] = []
+      try {
+        const storedContracts = localStorage.getItem('contracts')
+        if (storedContracts) {
+          const parsedContracts = JSON.parse(storedContracts)
+          
+          // Convert dates for user contracts and ensure unique IDs
+          userContracts = parsedContracts
+            .filter((contract: any) => {
+              // Filter out any contracts that have IDs matching static contracts
+              return !staticContracts.some(sc => sc.id === contract.id)
+            })
+            .map((contract: any) => ({
+              ...contract,
+              deliveryDate: new Date(contract.deliveryDate),
+              startDate: new Date(contract.startDate || Date.now()),
+              endDate: new Date(contract.endDate || Date.now()),
+              createdAt: new Date(contract.createdAt),
+              updatedAt: new Date(contract.updatedAt)
+            }))
+        }
+      } catch (error) {
+        console.error("Error reading from localStorage:", error)
+        userContracts = []
+      }
+
+      // Get updated versions of static contracts from localStorage
+      const updatedStaticContracts = staticContracts.map(staticContract => {
+        const storedContract = userContracts.find(uc => uc.id === staticContract.id)
+        return storedContract || staticContract
+      })
+
+      // Combine static and user contracts, ensuring no duplicates
+      const allContracts = [...updatedStaticContracts, ...userContracts]
+      
+      // Set all contracts without filtering by role
+      setContracts(allContracts)
+      console.log("Loaded contracts:", allContracts)
+    } catch (error) {
+      console.error("Error loading contracts:", error)
+      setContracts([])
+    }
   }
 
-  // Combine all contracts for filtering
-  const allContracts = [
-    ...mockContracts.active,
-    ...mockContracts.pending,
-    ...mockContracts.completed,
-    ...mockContracts.disputed,
-  ]
+  // Load contracts when component mounts
+  useEffect(() => {
+    loadContracts()
+  }, [])
+
+  // Show success message and refresh contracts when a new contract is created
+  useEffect(() => {
+    if (searchParams.get("success") === "created") {
+      toast.success("Contract created successfully!")
+      loadContracts()
+    }
+  }, [searchParams])
 
   // Filter contracts based on search term and status
-  const filteredContracts = allContracts
+  const filteredContracts = contracts
     .filter((contract) => {
       const matchesSearch =
         contract.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        contract.counterparty.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        contract.counterpartyName.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contract.crop.toLowerCase().includes(searchTerm.toLowerCase()) ||
         contract.id.toLowerCase().includes(searchTerm.toLowerCase())
 
-      const matchesStatus = statusFilter === "all" || contract.status.toLowerCase().includes(statusFilter.toLowerCase())
+      const matchesStatus = statusFilter === "all" || contract.status === statusFilter
 
       return matchesSearch && matchesStatus
     })
     .sort((a, b) => {
       if (sortField === "date") {
-        const dateA = new Date(a.startDate || a.proposedStartDate || a.submittedDate || a.completionDate)
-        const dateB = new Date(b.startDate || b.proposedStartDate || b.submittedDate || b.completionDate)
+        const dateA = new Date(a.createdAt)
+        const dateB = new Date(b.createdAt)
         return sortOrder === "asc" ? dateA.getTime() - dateB.getTime() : dateB.getTime() - dateA.getTime()
       } else {
-        return sortOrder === "asc" ? a.totalValue - b.totalValue : b.totalValue - a.totalValue
+        return sortOrder === "asc" ? a.totalPrice - b.totalPrice : b.totalPrice - a.totalPrice
       }
     })
 
@@ -270,10 +306,14 @@ export default function ContractList() {
             <CardTitle className="text-sm font-medium">Active Contracts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockContracts.active.length}</div>
+            <div className="text-2xl font-bold">
+              {contracts.filter((c) => c.status === "active").length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {mockContracts.active.length > 0
-                ? "Next delivery on " + mockContracts.active[0].nextDelivery
+              {contracts.filter((c) => c.status === "active").length > 0
+                ? "Next delivery on " + (contracts.find((c) => c.status === "active")?.deliveryDate 
+                  ? new Date(contracts.find((c) => c.status === "active")!.deliveryDate).toLocaleDateString()
+                  : "Not specified")
                 : "No active contracts"}
             </p>
           </CardContent>
@@ -283,9 +323,11 @@ export default function ContractList() {
             <CardTitle className="text-sm font-medium">Pending Contracts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockContracts.pending.length}</div>
+            <div className="text-2xl font-bold">
+              {contracts.filter((c) => c.status === "pending").length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {mockContracts.pending.length > 0 ? "Awaiting approval" : "No pending contracts"}
+              {contracts.filter((c) => c.status === "pending").length > 0 ? "Awaiting approval" : "No pending contracts"}
             </p>
           </CardContent>
         </Card>
@@ -294,10 +336,14 @@ export default function ContractList() {
             <CardTitle className="text-sm font-medium">Completed Contracts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockContracts.completed.length}</div>
+            <div className="text-2xl font-bold">
+              {contracts.filter((c) => c.status === "completed").length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {mockContracts.completed.length > 0
-                ? "Last completed on " + mockContracts.completed[0].completionDate
+              {contracts.filter((c) => c.status === "completed").length > 0
+                ? "Last completed on " + (contracts.find((c) => c.status === "completed")?.updatedAt
+                  ? new Date(contracts.find((c) => c.status === "completed")!.updatedAt).toLocaleDateString()
+                  : "Not specified")
                 : "No completed contracts"}
             </p>
           </CardContent>
@@ -307,9 +353,11 @@ export default function ContractList() {
             <CardTitle className="text-sm font-medium">Disputed Contracts</CardTitle>
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">{mockContracts.disputed.length}</div>
+            <div className="text-2xl font-bold">
+              {contracts.filter((c) => c.status === "disputed").length}
+            </div>
             <p className="text-xs text-muted-foreground">
-              {mockContracts.disputed.length > 0 ? "Requires attention" : "No disputed contracts"}
+              {contracts.filter((c) => c.status === "disputed").length > 0 ? "Requires attention" : "No disputed contracts"}
             </p>
           </CardContent>
         </Card>
@@ -335,10 +383,13 @@ export default function ContractList() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Statuses</SelectItem>
-              <SelectItem value="active">Active</SelectItem>
+              <SelectItem value="draft">Draft</SelectItem>
               <SelectItem value="pending">Pending</SelectItem>
-              <SelectItem value="negotiation">In Negotiation</SelectItem>
+              <SelectItem value="negotiating">Negotiating</SelectItem>
+              <SelectItem value="accepted">Accepted</SelectItem>
+              <SelectItem value="active">Active</SelectItem>
               <SelectItem value="completed">Completed</SelectItem>
+              <SelectItem value="cancelled">Cancelled</SelectItem>
               <SelectItem value="disputed">Disputed</SelectItem>
             </SelectContent>
           </Select>
@@ -360,9 +411,13 @@ export default function ContractList() {
       <Tabs defaultValue="all">
         <TabsList className="mb-6">
           <TabsTrigger value="all">All Contracts</TabsTrigger>
-          <TabsTrigger value="active">Active</TabsTrigger>
+          <TabsTrigger value="draft">Draft</TabsTrigger>
           <TabsTrigger value="pending">Pending</TabsTrigger>
+          <TabsTrigger value="negotiating">Negotiating</TabsTrigger>
+          <TabsTrigger value="accepted">Accepted</TabsTrigger>
+          <TabsTrigger value="active">Active</TabsTrigger>
           <TabsTrigger value="completed">Completed</TabsTrigger>
+          <TabsTrigger value="cancelled">Cancelled</TabsTrigger>
           <TabsTrigger value="disputed">Disputed</TabsTrigger>
         </TabsList>
 
@@ -396,7 +451,7 @@ export default function ContractList() {
                     </svg>
                   </div>
                   <h3 className="mt-4 text-lg font-semibold">No contracts found</h3>
-                  <p className="mt-2 text-sm text-muted-foreground max-w-xs">
+                  <p className="text-sm text-muted-foreground">
                     No contracts match your current filters. Try adjusting your search or filters.
                   </p>
                   <Button
@@ -434,20 +489,7 @@ export default function ContractList() {
                           </Button>
                         </TableHead>
                         <TableHead>Status</TableHead>
-                        <TableHead>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            className="-ml-3 h-8 data-[state=open]:bg-accent"
-                            onClick={() => {
-                              setSortField("date")
-                              setSortOrder(sortOrder === "asc" ? "desc" : "asc")
-                            }}
-                          >
-                            Date
-                            <ArrowUpDown className="ml-2 h-4 w-4" />
-                          </Button>
-                        </TableHead>
+                        <TableHead>Created Date</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
@@ -459,22 +501,21 @@ export default function ContractList() {
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Avatar className="h-8 w-8">
-                                <AvatarImage src={contract.counterparty.avatar} alt={contract.counterparty.name} />
-                                <AvatarFallback>{contract.counterparty.name.charAt(0)}</AvatarFallback>
+                                <AvatarFallback>{contract.counterpartyName.charAt(0)}</AvatarFallback>
                               </Avatar>
-                              <span>{contract.counterparty.name}</span>
+                              <span>{contract.counterpartyName}</span>
                             </div>
                           </TableCell>
                           <TableCell>{contract.crop}</TableCell>
-                          <TableCell>₹{(contract.totalValue / 1000).toFixed(0)}K</TableCell>
+                          <TableCell>₹{(contract.totalPrice / 1000).toFixed(0)}K</TableCell>
                           <TableCell>
                             <Badge
                               variant={
-                                contract.status === "Active"
+                                contract.status === "active"
                                   ? "default"
-                                  : contract.status === "Completed"
-                                    ? "success"
-                                    : contract.status === "Disputed"
+                                  : contract.status === "completed"
+                                    ? "secondary"
+                                    : contract.status === "disputed"
                                       ? "destructive"
                                       : "outline"
                               }
@@ -482,13 +523,19 @@ export default function ContractList() {
                               {contract.status}
                             </Badge>
                           </TableCell>
-                          <TableCell>
-                            {contract.startDate || contract.proposedStartDate || contract.submittedDate}
-                          </TableCell>
+                          <TableCell>{new Date(contract.createdAt).toLocaleDateString()}</TableCell>
                           <TableCell>
                             <div className="flex items-center gap-2">
                               <Button variant="outline" size="sm" asChild>
                                 <Link href={`/contract-details/${contract.id}`}>View</Link>
+                              </Button>
+                              <Button 
+                                variant="default" 
+                                size="sm" 
+                                className="bg-green-600 hover:bg-green-700"
+                                onClick={() => router.push(`/payment?contractId=${contract.id}&amount=${contract.totalPrice}&title=${encodeURIComponent(contract.title)}&counterparty=${encodeURIComponent(contract.counterpartyName)}`)}
+                              >
+                                Make Payment
                               </Button>
                             </div>
                           </TableCell>
@@ -523,17 +570,16 @@ export default function ContractList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockContracts.active.map((contract) => (
+                    {contracts.filter(c => c.status === "active").map((contract) => (
                       <TableRow key={contract.id}>
                         <TableCell className="font-medium">{contract.id}</TableCell>
                         <TableCell>{contract.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={contract.counterparty.avatar} alt={contract.counterparty.name} />
-                              <AvatarFallback>{contract.counterparty.name.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{contract.counterpartyName.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span>{contract.counterparty.name}</span>
+                            <span>{contract.counterpartyName}</span>
                           </div>
                         </TableCell>
                         <TableCell>
@@ -541,14 +587,18 @@ export default function ContractList() {
                             <div className="h-2 w-24 rounded-full bg-muted">
                               <div
                                 className="h-full rounded-full bg-green-600"
-                                style={{ width: `${contract.progress}%` }}
+                                style={{ width: `${contract.progress || 0}%` }}
                               />
                             </div>
-                            <span className="text-sm text-muted-foreground">{contract.progress}%</span>
+                            <span className="text-sm text-muted-foreground">{contract.progress || 0}%</span>
                           </div>
                         </TableCell>
-                        <TableCell>{contract.nextDelivery}</TableCell>
-                        <TableCell>{contract.endDate}</TableCell>
+                        <TableCell>
+                          {contract.deliveryDate ? new Date(contract.deliveryDate).toLocaleDateString() : "Not specified"}
+                        </TableCell>
+                        <TableCell>
+                          {contract.endDate ? new Date(contract.endDate).toLocaleDateString() : "Not specified"}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" asChild>
@@ -589,31 +639,38 @@ export default function ContractList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockContracts.pending.map((contract) => (
+                    {contracts.filter(c => c.status === "pending").map((contract) => (
                       <TableRow key={contract.id}>
                         <TableCell className="font-medium">{contract.id}</TableCell>
                         <TableCell>{contract.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={contract.counterparty.avatar} alt={contract.counterparty.name} />
-                              <AvatarFallback>{contract.counterparty.name.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{contract.counterpartyName.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span>{contract.counterparty.name}</span>
+                            <span>{contract.counterpartyName}</span>
                           </div>
                         </TableCell>
                         <TableCell>
                           <Badge variant="outline">{contract.status}</Badge>
                         </TableCell>
-                        <TableCell>{contract.submittedDate}</TableCell>
-                        <TableCell>{contract.proposedStartDate}</TableCell>
+                        <TableCell>{new Date(contract.createdAt).toLocaleDateString()}</TableCell>
+                        <TableCell>
+                          {contract.startDate ? new Date(contract.startDate).toLocaleDateString() : "Not specified"}
+                        </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" asChild>
                               <Link href={`/contract-details/${contract.id}`}>View</Link>
                             </Button>
-                            <Button size="sm" className="bg-green-600 hover:bg-green-700">
-                              {contract.status === "In Negotiation" ? "Negotiate" : "Review"}
+                            <Button 
+                              size="sm" 
+                              className="bg-green-600 hover:bg-green-700"
+                              asChild
+                            >
+                              <Link href={`/contract-details/${contract.id}?mode=review`}>
+                                {contract.status === "negotiating" ? "Negotiate" : "Review"}
+                              </Link>
                             </Button>
                           </div>
                         </TableCell>
@@ -647,24 +704,24 @@ export default function ContractList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockContracts.completed.map((contract) => (
+                    {contracts.filter(c => c.status === "completed").map((contract) => (
                       <TableRow key={contract.id}>
                         <TableCell className="font-medium">{contract.id}</TableCell>
                         <TableCell>{contract.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={contract.counterparty.avatar} alt={contract.counterparty.name} />
-                              <AvatarFallback>{contract.counterparty.name.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{contract.counterpartyName.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span>{contract.counterparty.name}</span>
+                            <span>{contract.counterpartyName}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{contract.finalPayment}</TableCell>
-                        <TableCell>{contract.completionDate}</TableCell>
+                        <TableCell>₹{(contract.totalPrice / 1000).toFixed(0)}K</TableCell>
+                        <TableCell>{new Date(contract.updatedAt).toLocaleDateString()}</TableCell>
                         <TableCell>
-                          {new Date(contract.startDate).toLocaleDateString()} -{" "}
-                          {new Date(contract.endDate).toLocaleDateString()}
+                          {contract.startDate && contract.endDate
+                            ? `${new Date(contract.startDate).toLocaleDateString()} - ${new Date(contract.endDate).toLocaleDateString()}`
+                            : "Not specified"}
                         </TableCell>
                         <TableCell>
                           <Button variant="outline" size="sm" asChild>
@@ -701,31 +758,38 @@ export default function ContractList() {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {mockContracts.disputed.map((contract) => (
+                    {contracts.filter(c => c.status === "disputed").map((contract) => (
                       <TableRow key={contract.id}>
                         <TableCell className="font-medium">{contract.id}</TableCell>
                         <TableCell>{contract.title}</TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Avatar className="h-8 w-8">
-                              <AvatarImage src={contract.counterparty.avatar} alt={contract.counterparty.name} />
-                              <AvatarFallback>{contract.counterparty.name.charAt(0)}</AvatarFallback>
+                              <AvatarFallback>{contract.counterpartyName.charAt(0)}</AvatarFallback>
                             </Avatar>
-                            <span>{contract.counterparty.name}</span>
+                            <span>{contract.counterpartyName}</span>
                           </div>
                         </TableCell>
-                        <TableCell>{contract.disputeReason}</TableCell>
-                        <TableCell>{contract.disputeDate}</TableCell>
+                        <TableCell>{contract.disputeReason || "Not specified"}</TableCell>
                         <TableCell>
-                          {new Date(contract.startDate).toLocaleDateString()} -{" "}
-                          {new Date(contract.endDate).toLocaleDateString()}
+                          {contract.disputeDate ? new Date(contract.disputeDate).toLocaleDateString() : "Not specified"}
+                        </TableCell>
+                        <TableCell>
+                          {contract.startDate && contract.endDate
+                            ? `${new Date(contract.startDate).toLocaleDateString()} - ${new Date(contract.endDate).toLocaleDateString()}`
+                            : "Not specified"}
                         </TableCell>
                         <TableCell>
                           <div className="flex items-center gap-2">
                             <Button variant="outline" size="sm" asChild>
                               <Link href={`/contract-details/${contract.id}`}>View</Link>
                             </Button>
-                            {handlePayment}
+                            <Button 
+                              onClick={() => router.push(`/payment?contractId=${contract.id}&amount=${contract.totalPrice}&title=${encodeURIComponent(contract.title)}&counterparty=${encodeURIComponent(contract.counterpartyName)}`)}
+                              className="bg-green-600 hover:bg-green-700"
+                            >
+                              Make Payment
+                            </Button>
                           </div>
                         </TableCell>
                       </TableRow>

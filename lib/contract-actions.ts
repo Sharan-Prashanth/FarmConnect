@@ -1,7 +1,7 @@
 "use server"
 
 import { db } from "@/lib/db"
-import type { Contract } from "@/lib/types"
+import type { Contract, ContractStatus } from "@/lib/types"
 
 /**
  * Create a new contract
@@ -9,7 +9,12 @@ import type { Contract } from "@/lib/types"
 export async function createContract(contractData: Partial<Contract>) {
   try {
     const contract = await db.contract.create({
-      data: contractData,
+      data: {
+        ...contractData,
+        status: (contractData.status || "draft") as ContractStatus,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
     })
     return { success: true, data: contract }
   } catch (error) {
@@ -44,13 +49,12 @@ export async function fetchContractDetails(contractId: string) {
 export async function fetchContracts(filters?: {
   farmerId?: string
   buyerId?: string
-  status?: string
+  status?: ContractStatus
 }) {
   try {
     const contracts = await db.contract.findMany({
       where: filters,
     })
-
     return { success: true, data: contracts }
   } catch (error) {
     console.error("Error fetching contracts:", error)
@@ -59,26 +63,9 @@ export async function fetchContracts(filters?: {
 }
 
 /**
- * Update an existing contract
+ * Update contract status
  */
-export async function updateContract(contractId: string, contractData: Partial<Contract>) {
-  try {
-    const contract = await db.contract.update({
-      where: { id: contractId },
-      data: contractData,
-    })
-
-    return { success: true, data: contract }
-  } catch (error) {
-    console.error("Error updating contract:", error)
-    return { success: false, error: "Failed to update contract" }
-  }
-}
-
-/**
- * Change contract status
- */
-export async function updateContractStatus(contractId: string, status: string) {
+export async function updateContractStatus(contractId: string, status: ContractStatus) {
   try {
     const contract = await db.contract.update({
       where: { id: contractId },
@@ -89,6 +76,26 @@ export async function updateContractStatus(contractId: string, status: string) {
   } catch (error) {
     console.error("Error updating contract status:", error)
     return { success: false, error: "Failed to update contract status" }
+  }
+}
+
+/**
+ * Update contract details
+ */
+export async function updateContract(contractId: string, data: Partial<Contract>) {
+  try {
+    const contract = await db.contract.update({
+      where: { id: contractId },
+      data: {
+        ...data,
+        updatedAt: new Date(),
+      },
+    })
+
+    return { success: true, data: contract }
+  } catch (error) {
+    console.error("Error updating contract:", error)
+    return { success: false, error: "Failed to update contract" }
   }
 }
 
@@ -107,6 +114,34 @@ export async function deleteContract(contractId: string) {
   } catch (error) {
     console.error("Error deleting contract:", error)
     return { success: false, error: "Failed to delete contract" }
+  }
+}
+
+/**
+ * Move contract to negotiation stage
+ */
+export async function moveToNegotiation(contractId: string, negotiationDetails: {
+  proposedPrice?: number
+  proposedQuantity?: number
+  proposedDeliveryDate?: Date
+  comments?: string
+}) {
+  try {
+    const contract = await db.contract.update({
+      where: { id: contractId },
+      data: { 
+        status: "negotiating",
+        updatedAt: new Date(),
+      },
+    })
+
+    // In a real application, you would also create a negotiation record here
+    // with the proposed changes and comments
+
+    return { success: true, data: contract }
+  } catch (error) {
+    console.error("Error moving contract to negotiation:", error)
+    return { success: false, error: "Failed to move contract to negotiation stage" }
   }
 }
 

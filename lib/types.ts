@@ -32,9 +32,22 @@ export interface Contract {
   deliveryDate: Date
   paymentTerms: string
   qualityParameters: string
+  additionalTerms?: string
   status: ContractStatus
   createdAt: Date
   updatedAt: Date
+  // Counterparty information
+  counterpartyName: string
+  counterpartyEmail?: string
+  counterpartyPhone?: string
+  counterpartyAddress?: string
+  counterpartyType: "farmer" | "buyer"
+  // Additional fields
+  startDate?: Date
+  endDate?: Date
+  progress?: number
+  disputeReason?: string
+  disputeDate?: Date
 }
 
 export type ContractStatus =
